@@ -1,0 +1,173 @@
+[
+  {
+    "id": 10,
+    "nombre": "Landing Page Express",
+    "precio": 135000,
+    "categoria": "Diseño Web",
+    "imagen": "img/Landing Page Express.jpg",
+    "descripcion": "Página rápida y efectiva para captar leads y presentar tu servicio en tiempo récord.",
+    "caracteristicas": ["Diseño 100% a medida", "Responsive (móvil y desktop)", "Integración WhatsApp", "Formulario de contacto"]
+  },
+  {
+    "id": 11,
+    "nombre": "Web Profesional Completa",
+    "precio": 210000,
+    "categoria": "Diseño Web",
+    "imagen": "img/banner_web_profesional.svg",
+    "descripcion": "Sitio completo con páginas internas, UX pensado para convertir y presencia de marca sólida.",
+    "caracteristicas": ["Hasta 8 secciones/páginas", "SEO técnico básico", "Optimización de carga", "Integración redes + analítica"]
+  },
+  {
+    "id": 12,
+    "nombre": "Pack Web + Branding",
+    "precio": 177600,
+    "categoria": "Diseño Web",
+    "imagen": "img/Pack web + branding.png",
+    "descripcion": "Web + identidad visual inicial para lanzar tu marca con impacto y coherencia.",
+    "caracteristicas": ["Web Landing + 3 secciones", "Logotipo básico", "Paleta y tipografía", "Soporte 30 días"]
+  },
+  {
+    "id": 13,
+    "nombre": "Mantenimiento Mensual",
+    "precio": 20000,
+    "categoria": "Diseño Web",
+    "imagen": "img/mantenimiento-para-una-pagina-web-scaled.jpg",
+    "descripcion": "Actualizaciones, backups y soporte técnico para que tu web nunca pare.",
+    "caracteristicas": ["Actualizaciones y seguridad", "Backup mensual", "Pequeños cambios incluidos"]
+  },
+  {
+    "id": 14,
+    "nombre": "Pack Flyers + Banners",
+    "precio": 60000,
+    "categoria": "Diseño Gráfico",
+    "imagen": "img/Pack Flyer + Banner.png",
+    "descripcion": "Piezas para campañas y eventos con diseño profesional y archivos listos para imprimir.",
+    "caracteristicas": ["3 propuestas iniciales", "Archivos listos para imprenta", "Formato adaptable redes"]
+  },
+  {
+    "id": 15,
+    "nombre": "Tarjeta Digital Interactiva",
+    "precio": 40000,
+    "categoria": "Diseño Gráfico",
+    "imagen": "img/digital-business-card_professional.webp",
+    "descripcion": "Tarjeta digital con enlace clic-to-call, WhatsApp y contacto directo.",
+    "caracteristicas": ["Diseño adaptado a tu marca", "Enlace y QR funcional", "Envío en PDF/PNG"]
+  },
+  {
+    "id": 16,
+    "nombre": "Pack Banners Redes Sociales",
+    "precio": 65000,
+    "categoria": "Diseño Gráfico",
+    "imagen": "img/banner_redes_sociales.svg",
+    "descripcion": "Series de banners optimizados para campañas y escalables a múltiples formatos.",
+    "caracteristicas": ["3 tamaños por pieza", "Optimizado para Ads", "Entrega en .jpg / .png"]
+  },
+  {
+    "id": 17,
+    "nombre": "Logotipo Profesional (3 propuestas)",
+    "precio": 87000,
+    "categoria": "Branding",
+    "imagen": "img/vector-degradado-logotipo-colorido-pajaro_343694-1365.avif",
+    "descripcion": "Variantes pensadas para adaptarse a todos los usos: digital e impresión.",
+    "caracteristicas": ["3 propuestas iniciales", "Entrega en vectores", "Guía de uso básica"]
+  },
+  {
+    "id": 18,
+    "nombre": "Pack Branding Esencial",
+    "precio": 120000,
+    "categoria": "Branding",
+    "imagen": "img/pack_branding.jpg",
+    "descripcion": "Identidad completa para comenzar con una marca consistente y profesional.",
+    "caracteristicas": ["Logotipo + paleta + tipografías", "Mockups básicos", "Mini manual de marca"]
+  },
+  {
+    "id": 19,
+    "nombre": "Manual de Marca Básico",
+    "precio": 45000,
+    "categoria": "Branding",
+    "imagen": "img/manualdemarca.png",
+    "descripcion": "Documento con reglas esenciales para el uso correcto de la marca.",
+    "caracteristicas": ["Colores, tipografías y aplicaciones", "Versiones del logo"]
+  },
+  {
+    "id": 20,
+    "nombre": "Pack 12 Posts",
+    "precio": 25000,
+    "categoria": "Social Media",
+    "imagen": "img/post.jpg",
+    "descripcion": "Doce piezas diseñadas para reforzar tu comunicación mensual.",
+    "caracteristicas": ["Diseño coherente con la marca", "Formatos para Instagram y Facebook", "Revisiones incluidas"]
+  },
+  {
+    "id": 21,
+    "nombre": "Historias Animadas",
+    "precio": 18000,
+    "categoria": "Social Media",
+    "imagen": "img/historias animadas.avif",
+    "descripcion": "Historias con movimiento para destacar promociones y novedades.",
+    "caracteristicas": ["Animaciones ligeras", "Formato vertical listo", "Optimizado para engagement"]
+  },
+  {
+    "id": 22,
+    "nombre": "Portadas Profesionales",
+    "precio": 12000,
+    "categoria": "Social Media",
+    "imagen": "img/portada pofesional.png",
+    "descripcion": "Portadas y destacados para mejorar la estética de tu perfil.",
+    "caracteristicas": ["Diseño adaptado a tu marca", "Entrega rápida"]
+  },
+  {
+    "id": 23,
+    "nombre": "Volante A5 - Diseño Rápido",
+    "precio": 8000,
+    "categoria": "Volantes & Flyers",
+    "imagen": "img/volanteA5.png",
+    "descripcion": "Diseño simple, 1 propuesta y entrega lista para imprimir.",
+    "caracteristicas": ["Archivo PDF para imprenta", "1 revisión incluida"]
+  },
+  {
+    "id": 24,
+    "nombre": "Volante A4 - Premium",
+    "precio": 15000,
+    "categoria": "Volantes & Flyers",
+    "imagen": "img/volanteA4.jpg",
+    "descripcion": "Diseño más elaborado con 2 propuestas y preparación para imprenta.",
+    "caracteristicas": ["2 propuestas", "Archivos listos CMYK"]
+  },
+  {
+    "id": 25,
+    "nombre": "Pack 50 Volantes (Impresos)",
+    "precio": 30000,
+    "categoria": "Volantes & Flyers",
+    "imagen": "img/pack50.webp",
+    "descripcion": "Diseño + impresión 50 unidades (opción económico para campañas locales).",
+    "caracteristicas": ["Incluye diseño y entrega lista", "Impresión en papel estándar"]
+  },
+  {
+    "id": 26,
+    "nombre": "Tarjeta Digital - Básica",
+    "precio": 6000,
+    "categoria": "Tarjetas Personales",
+    "imagen": "img/tarjetabasica.webp",
+    "descripcion": "Tarjeta digital simple con enlace y QR.",
+    "caracteristicas": ["Formato web y PDF", "1 revisión incluida"]
+  },
+  {
+    "id": 27,
+    "nombre": "Tarjeta Impresa - Premium",
+    "precio": 12000,
+    "categoria": "Tarjetas Personales",
+    "imagen": "img/tarjetaimpresa.webp",
+    "descripcion": "Diseño premium y entrega de archivos listos para impresión o impresión bajo demanda.",
+    "caracteristicas": ["Diseño + impresión opcional", "Acabado mate o brillo"]
+  },
+  {
+    "id": 28,
+    "nombre": "Pack 50 Tarjetas (Impresas)",
+    "precio": 22000,
+    "categoria": "Tarjetas Personales",
+    "imagen": "img/pack50.webp",
+    "descripcion": "Diseño y entrega de 50 tarjetas impresas, listo para repartir.",
+    "caracteristicas": ["Diseño adaptado", "50 unidades impresas"]
+  }
+]
