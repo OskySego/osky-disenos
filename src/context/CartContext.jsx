@@ -8,22 +8,35 @@ export const CartProvider = ({ children }) => {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
+  // Estado para controlar el mensaje del cartel de aviso
+  const [mensajeToast, setMensajeToast] = useState(null);
+
   useEffect(() => {
     localStorage.setItem('osky_cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (item, quantity = 1) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === product.id);
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
+      const itemExist = prevCart.find((p) => p.id === item.id);
+      if (itemExist) {
+        return prevCart.map((p) =>
+          p.id === item.id ? { ...p, quantity: p.quantity + quantity } : p
         );
       }
-      return [...prevCart, { ...product, quantity }];
+      return [...prevCart, { ...item, quantity }];
     });
+
+    // Activar el cartel flotante de aviso
+    setMensajeToast(`¡"${item.nombre}" se añadió al carrito! 🛒`);
+
+    // Ocultar el cartel automáticamente después de 3 segundos
+    setTimeout(() => {
+      setMensajeToast(null);
+    }, 3000);
+  };
+
+  const removeFromCart = (id) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
   };
 
   const increaseQuantity = (id) => {
@@ -37,35 +50,32 @@ export const CartProvider = ({ children }) => {
   const decreaseQuantity = (id) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+        item.id === id && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
           : item
       )
     );
-  };
-
-  const removeFromCart = (id) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== id));
   };
 
   const clearCart = () => {
     setCart([]);
   };
 
-  const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0);
-  const totalPrice = cart.reduce((total, item) => total + item.precio * item.quantity, 0);
+  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const totalPrice = cart.reduce((acc, item) => acc + item.precio * item.quantity, 0);
 
   return (
     <CartContext.Provider
       value={{
         cart,
         addToCart,
+        removeFromCart,
         increaseQuantity,
         decreaseQuantity,
-        removeFromCart,
         clearCart,
-        totalQuantity,
+        totalItems,
         totalPrice,
+        mensajeToast
       }}
     >
       {children}
