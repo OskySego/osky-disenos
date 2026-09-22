@@ -160,14 +160,6 @@ main {
 
 @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
-/* Estrellas fugaces */
-.floating-stars {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
 .star {
   position: absolute;
   width: 3px;
