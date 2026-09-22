@@ -1,30 +1,36 @@
-import React, { useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { NavBar } from './NavBar';
-import { CartWidget } from './CartWidget'; // <-- Importamos de nuevo el carrito
+import { CartWidget } from './CartWidget';
 import { CartContext } from '../context/CartContext';
 
 export const Header = () => {
   const { mensajeToast } = useContext(CartContext);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
   return (
     <header className="main-header">
-      {/* 1. Logo que redirige al inicio */}
+      {/* Logo */}
       <Link to="/" className="header-logo-container">
-        <img 
-          src="/img/logo.png" 
-          alt="Osky Diseños Logo" 
-          className="header-logo" 
-        />
+        <img src="public\img\Logo_for_Osky_Diseños.svg" alt="Osky Diseños Logo" className="header-logo" />
       </Link>
 
-      {/* 2. Menú de navegación principal */}
-      <NavBar />
+      {/* Botón hamburguesa visible solo en celulares */}
+      <button className="menu-toggle" onClick={toggleMenu} aria-label="Abrir menú">
+        {menuOpen ? '✖' : '☰'}
+      </button>
 
-      {/* 3. Ícono del Carrito de compras */}
+      {/* Menú de navegación */}
+      <NavBar isOpen={menuOpen} closeMenu={() => setMenuOpen(false)} />
+
+      {/* Carrito de compras */}
       <CartWidget />
 
-      {/* 4. Cartel flotante de aviso al agregar productos */}
+      {/* Notificación flotante */}
       {mensajeToast && (
         <div className="toast-notification">
           <span>{mensajeToast}</span>

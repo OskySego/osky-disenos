@@ -1,29 +1,21 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-export const NavBar = () => {
+export const NavBar = ({ isOpen, closeMenu }) => {
   return (
-    <nav className="main-nav" id="main-nav" aria-label="Menú principal">
+    <nav className={`main-nav ${isOpen ? 'open' : ''}`}>
       <ul>
         <li>
-          <NavLink to="/" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Inicio
-          </NavLink>
+          <NavLink to="/" onClick={closeMenu}>Inicio</NavLink>
         </li>
         <li>
-          <NavLink to="/productos" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Servicios
-          </NavLink>
+          <NavLink to="/productos" onClick={closeMenu}>Servicios</NavLink>
         </li>
         <li>
-          <NavLink to="/resenas" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Reseñas
-          </NavLink>
+          <NavLink to="/resenas" onClick={closeMenu}>Reseñas</NavLink>
         </li>
         <li>
-          <NavLink to="/contacto" className={({ isActive }) => (isActive ? 'active' : '')}>
-            Contacto
-          </NavLink>
+          <NavLink to="/contacto" onClick={closeMenu}>Contacto</NavLink>
         </li>
       </ul>
     </nav>

@@ -882,3 +882,52 @@ main {
     justify-content: center;
   }
 }
+/* ==========================================================================
+   BURBUJA DEL CONTADOR DEL CARRITO
+   ========================================================================== */
+.cart-widget {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.cart-icon {
+  font-size: 2.0rem; /* Tamaño del icono del carrito */
+  line-height: 1;
+}
+
+.cart-count {
+  background-color: var(--dorado);
+  color: var(--oscuro);
+  font-size: 0.95rem;        /* Tamaño del número */
+  font-weight: 800;
+  min-width: 26px;            /* Ancho mínimo para mantener forma circular */
+  height: 26px;               /* Alto fijo */
+  border-radius: 50%;         /* Hace la burbuja 100% redonda */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -6px;                  /* Posición vertical sobre el icono */
+  right: -12px;               /* Posición horizontal */
+  padding: 2px;
+  border: 2px solid var(--violeta); /* Borde para contrastar con el fondo */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  line-height: 1;
+}
+/* Adaptación de botones para pantallas muy chicas */
+@media (max-width: 480px) {
+  .product-card-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .btn-detail,
+  .btn-add-cart {
+    width: 100%;
+    text-align: center;
+  }
+}
