@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { NavBar } from './NavBar';
 import { CartWidget } from './CartWidget';
@@ -7,30 +7,60 @@ import { CartContext } from '../context/CartContext';
 export const Header = () => {
   const { mensajeToast } = useContext(CartContext);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  // Toggle Menú Hamburguesa (Mobile)
+  const toggleMenu = () => setMenuOpen(!menuOpen);
+
+  // Toggle Pantalla Completa
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error al activar pantalla completa: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
   };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   return (
     <header className="main-header">
-      {/* Logo */}
+      {/* 1. Logo con ruta corregida para Vite (/img/... en lugar de /public/img/...) */}
       <Link to="/" className="header-logo-container">
-        <img src="public\img\Logo_for_Osky_Diseños.svg" alt="Osky Diseños Logo" className="header-logo" />
+        <img 
+          src="/img/Logo_for_Osky_Diseños.svg" 
+          alt="Osky Diseños Logo" 
+          className="header-logo" 
+        />
       </Link>
 
-      {/* Botón hamburguesa visible solo en celulares */}
+      {/* 2. Botón menú hamburguesa (visibilidad mobile) */}
       <button className="menu-toggle" onClick={toggleMenu} aria-label="Abrir menú">
         {menuOpen ? '✖' : '☰'}
       </button>
 
-      {/* Menú de navegación */}
+      {/* 3. Navegación principal */}
       <NavBar isOpen={menuOpen} closeMenu={() => setMenuOpen(false)} />
 
-      {/* Carrito de compras */}
-      <CartWidget />
+      {/* 4. Acciones del Header (Pantalla completa + Carrito) */}
+      <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <button onClick={toggleFullscreen} className="btn-fullscreen" title="Pantalla completa">
+          {isFullscreen ? '🗗' : '⛶'}
+        </button>
+        <CartWidget />
+      </div>
 
-      {/* Notificación flotante */}
+      {/* 5. Cartel flotante de aviso */}
       {mensajeToast && (
         <div className="toast-notification">
           <span>{mensajeToast}</span>

@@ -57,9 +57,18 @@ main {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
+.header-logo-container {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 .header-logo {
-  height: 90px;
+  height: 50px;
   width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
 }
 
 .menu-toggle {
@@ -92,6 +101,40 @@ main {
 .main-nav a.active {
   background: var(--dorado);
   color: #000;
+}
+
+/* Widget e Ícono del Carrito */
+.cart-widget {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.cart-icon {
+  font-size: 2.0rem;
+  line-height: 1;
+}
+
+.cart-count {
+  background-color: var(--dorado);
+  color: var(--oscuro);
+  font-size: 0.95rem;
+  font-weight: 800;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -6px;
+  right: -12px;
+  padding: 2px;
+  border: 2px solid var(--violeta);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  line-height: 1;
 }
 
 /* ==========================================================================
@@ -261,7 +304,6 @@ main {
   padding: 2rem 5%;
 }
 
-/* Tarjeta contenedora de producto */
 .product-card {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -293,7 +335,7 @@ main {
 .product-img {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain; /* Evita recortes en logos e imágenes */
+  object-fit: contain;
   transition: transform 0.3s ease;
 }
 
@@ -381,7 +423,6 @@ main {
   transition: all 0.25s ease;
 }
 
-/* Estado de éxito cuando se agrega un producto */
 .btn-success-added {
   background-color: #2e7d32 !important;
   color: #ffffff !important;
@@ -389,7 +430,6 @@ main {
   box-shadow: 0 0 12px rgba(46, 125, 50, 0.5) !important;
 }
 
-/* Estilo genérico box-card para variantes */
 .box-card {
   background: #f7f7f7;
   color: #0D1321;
@@ -761,7 +801,40 @@ main {
 }
 
 /* ==========================================================================
-   10. MEDIA QUERIES (RESPONSIVE)
+   10. CARTEL FLOTANTE DE NOTIFICACIÓN (TOAST)
+   ========================================================================== */
+.toast-notification {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  color: #ffffff;
+  padding: 16px 28px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 700;
+  font-size: 1rem;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideInUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   11. MEDIA QUERIES (RESPONSIVE)
    ========================================================================== */
 @media (max-width: 768px) {
   .menu-toggle { 
@@ -830,41 +903,7 @@ main {
     flex-direction: column;
     text-align: center;
   }
-}
-/* ==========================================================================
-   CARTEL FLOTANTE DE NOTIFICACIÓN (TOAST)
-   ========================================================================== */
-.toast-notification {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background: linear-gradient(135deg, #2e7d32, #1b5e20);
-  color: #ffffff;
-  padding: 16px 28px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-weight: 700;
-  font-size: 1rem;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: slideInUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
 
-@keyframes slideInUp {
-  from {
-    transform: translateY(100px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@media (max-width: 768px) {
   .toast-notification {
     bottom: 20px;
     right: 20px;
@@ -873,42 +912,7 @@ main {
     justify-content: center;
   }
 }
-/* ==========================================================================
-   BURBUJA DEL CONTADOR DEL CARRITO
-   ========================================================================== */
-.cart-widget {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
 
-.cart-icon {
-  font-size: 2.0rem; /* Tamaño del icono del carrito */
-  line-height: 1;
-}
-
-.cart-count {
-  background-color: var(--dorado);
-  color: var(--oscuro);
-  font-size: 0.95rem;        /* Tamaño del número */
-  font-weight: 800;
-  min-width: 26px;            /* Ancho mínimo para mantener forma circular */
-  height: 26px;               /* Alto fijo */
-  border-radius: 50%;         /* Hace la burbuja 100% redonda */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: -6px;                  /* Posición vertical sobre el icono */
-  right: -12px;               /* Posición horizontal */
-  padding: 2px;
-  border: 2px solid var(--violeta); /* Borde para contrastar con el fondo */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  line-height: 1;
-}
-/* Adaptación de botones para pantallas muy chicas */
 @media (max-width: 480px) {
   .product-card-actions {
     flex-direction: column;
