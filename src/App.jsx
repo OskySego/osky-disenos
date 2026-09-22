@@ -8,7 +8,7 @@ import { ItemDetail } from './pages/ItemDetail';
 import { ResenasPage } from './pages/ResenasPage';
 import { ContactoPage } from './pages/ContactoPage';
 import { CarritoPage } from './pages/CarritoPage';
-import './css/styles.css';
+import "./css/styles.css";
 
 function App() {
   return (
