@@ -1285,3 +1285,194 @@ main, .page-content {
     padding: 2rem 1.2rem;
   }
 }
+/* ==========================================================================
+   AJUSTE ENLACES NAVBAR (EVITA SALTO DE LÍNEA EN "MI PERFIL")
+   ========================================================================== */
+.main-nav ul {
+  gap: 0.9rem;
+}
+
+.main-nav a {
+  white-space: nowrap;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.9rem;
+}
+
+/* ==========================================================================
+   VISTA DE PERFIL DE USUARIO (CLAROSCURO CENTRADO)
+   ========================================================================== */
+.profile-page-section {
+  width: 100%;
+  min-height: calc(100vh - 160px);
+  padding: 3.5rem 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 25%, rgba(120, 81, 169, 0.30) 0%, var(--violeta-profundo, #330066) 72%);
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 2.6rem 2.2rem;
+  border-radius: 22px;
+  background: linear-gradient(160deg, rgba(120, 81, 169, 0.28) 0%, rgba(24, 0, 48, 0.96) 100%);
+  border: 1px solid rgba(120, 81, 169, 0.48);
+  box-shadow: 0 22px 55px rgba(10, 0, 22, 0.75), 0 0 35px rgba(120, 81, 169, 0.28);
+  backdrop-filter: blur(12px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-avatar-circle {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--oro-destello, #FFD700), var(--violeta-real, #7851A9));
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  box-shadow: 0 0 30px rgba(120, 81, 169, 0.75);
+}
+
+.profile-avatar-circle span {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--violeta-profundo, #330066);
+  color: var(--oro-destello, #FFD700);
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-title {
+  font-size: 1.9rem;
+  color: var(--lavanda-palido, #E6E6FA);
+  margin-bottom: 0.2rem;
+}
+
+.profile-subtitle {
+  font-size: 0.92rem;
+  color: var(--lavanda-tenue, rgba(230, 230, 250, 0.7));
+  margin-bottom: 1.8rem;
+}
+
+.profile-info-box {
+  width: 100%;
+  background: rgba(20, 0, 40, 0.65);
+  border: 1px solid rgba(120, 81, 169, 0.35);
+  border-radius: 14px;
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.profile-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.profile-info-row:first-child {
+  padding-bottom: 0.9rem;
+  border-bottom: 1px dashed rgba(120, 81, 169, 0.35);
+}
+
+.profile-label {
+  font-size: 0.88rem;
+  color: var(--lavanda-tenue, rgba(230, 230, 250, 0.7));
+}
+
+.profile-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--lavanda-palido, #E6E6FA);
+  word-break: break-all;
+}
+
+.profile-role-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(120, 81, 169, 0.3);
+  color: var(--lavanda-palido, #E6E6FA);
+  border: 1px solid rgba(120, 81, 169, 0.5);
+}
+
+.profile-role-badge.is-admin {
+  background: rgba(255, 215, 0, 0.14);
+  color: var(--oro-destello, #FFD700);
+  border-color: rgba(255, 215, 0, 0.45);
+}
+
+.profile-admin-panel {
+  width: 100%;
+  margin-bottom: 1.8rem;
+}
+
+.profile-admin-heading {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--lavanda-tenue, rgba(230, 230, 250, 0.7));
+  margin-bottom: 0.9rem;
+}
+
+.profile-admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.profile-admin-actions .cta-button,
+.profile-admin-actions .secondary-cta {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  padding: 13px 20px;
+}
+
+.profile-footer-actions {
+  width: 100%;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(120, 81, 169, 0.3);
+}
+
+.btn-logout-profile {
+  width: 100%;
+  padding: 11px 20px;
+  border-radius: 50px;
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.42);
+  color: #ff8080;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-logout-profile:hover {
+  background: #e53935;
+  border-color: #e53935;
+  color: #ffffff;
+  box-shadow: 0 0 18px rgba(229, 57, 53, 0.45);
+}
