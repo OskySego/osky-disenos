@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { CartContext } from '../context/CartContext';
 
 export const ItemDetail = () => {
@@ -11,29 +13,25 @@ export const ItemDetail = () => {
   const [agregado, setAgregado] = useState(false);
   const { addToCart } = useContext(CartContext);
 
-  const obtenerProducto = () => {
+  useEffect(() => {
     setLoading(true);
     setError(null);
 
-    fetch('/productos.json')
-      .then((res) => {
-        if (!res.ok) throw new Error('Error de conexión al obtener los datos.');
-        return res.json();
-      })
-      .then((data) => {
-        const itemEncontrado = data.find((p) => p.id === parseInt(id));
-        if (!itemEncontrado) throw new Error('El servicio solicitado no existe.');
-        setProducto(itemEncontrado);
-        setLoading(false);
+    const docRef = doc(db, 'productos', id);
+
+    getDoc(docRef)
+      .then((resp) => {
+        if (!resp.exists()) {
+          throw new Error('El servicio o producto solicitado no existe.');
+        }
+        setProducto({ ...resp.data(), id: resp.id });
       })
       .catch((err) => {
         setError(err.message || 'No se pudo cargar el detalle del servicio.');
+      })
+      .finally(() => {
         setLoading(false);
       });
-  };
-
-  useEffect(() => {
-    obtenerProducto();
   }, [id]);
 
   const handleAddToCart = () => {
@@ -63,28 +61,43 @@ export const ItemDetail = () => {
     );
   }
 
+  const imgSrc = producto.imagen?.startsWith('http') ? producto.imagen : `/${producto.imagen}`;
+
   return (
     <section className="detail-container" style={{ padding: '40px 20px', maxWidth: '800px', margin: '0 auto' }}>
       <Link to="/productos" className="secondary-cta" style={{ marginBottom: '20px', display: 'inline-block' }}>
         ← Volver a Servicios
       </Link>
+
       <div className="product-card" style={{ padding: '25px', flexDirection: 'row', gap: '30px', flexWrap: 'wrap' }}>
         <div style={{ width: '100%', maxWidth: '320px', height: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', padding: '10px' }}>
-          <img src={`/${producto.imagen}`} alt={producto.nombre} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+          <img src={imgSrc} alt={producto.nombre} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
         </div>
 
         <div style={{ flex: 1, minWidth: '280px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <span style={{ color: '#ffd700', fontSize: '0.85rem', textTransform: 'uppercase' }}>{producto.categoria}</span>
           <h2>{producto.nombre}</h2>
           <p style={{ color: '#ffd700', fontSize: '1.6rem', fontWeight: 'bold', margin: '10px 0' }}>
-            ${producto.precio.toLocaleString('es-AR')} ARS
+            ${Number(producto.precio).toLocaleString('es-AR')} ARS
           </p>
           <p style={{ color: '#ccc', lineHeight: '1.5' }}>{producto.descripcion}</p>
+          {producto.stock !== undefined && (
+            <p style={{ fontSize: '0.9rem', opacity: 0.85, marginTop: '8px' }}>
+              Stock disponible: {producto.stock}
+            </p>
+          )}
 
           <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <label style={{ fontWeight: 'bold' }}>Cantidad:</label>
             <button onClick={() => setCantidad(Math.max(1, cantidad - 1))} className="cta-button" style={{ padding: '4px 12px' }}>-</button>
             <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{cantidad}</span>
-            <button onClick={() => setCantidad(cantidad + 1)} className="cta-button" style={{ padding: '4px 12px' }}>+</button>
+            <button
+              onClick={() => setCantidad((prev) => (!producto.stock || prev < producto.stock ? prev + 1 : prev))}
+              className="cta-button"
+              style={{ padding: '4px 12px' }}
+            >
+              +
+            </button>
           </div>
 
           <button

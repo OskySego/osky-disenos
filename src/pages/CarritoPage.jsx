@@ -1,9 +1,65 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import { CartContext } from '../context/CartContext';
 
 export const CarritoPage = () => {
   const { cart, increaseQuantity, decreaseQuantity, removeFromCart, clearCart, totalPrice } = useContext(CartContext);
+
+  const [codigoCupon, setCodigoCupon] = useState('');
+  const [cuponAplicado, setCuponAplicado] = useState(null);
+  const [errorCupon, setErrorCupon] = useState('');
+  const [validandoCupon, setValidandoCupon] = useState(false);
+
+  const montoDescuento = cuponAplicado ? (totalPrice * cuponAplicado.descuento) / 100 : 0;
+  const totalConDescuento = totalPrice - montoDescuento;
+
+  const handleAplicarCupon = async (e) => {
+    e.preventDefault();
+    setErrorCupon('');
+
+    const codigoLimpio = codigoCupon.trim().toUpperCase();
+    if (!codigoLimpio) {
+      setErrorCupon('Ingresá un código de cupón.');
+      return;
+    }
+
+    setValidandoCupon(true);
+    try {
+      const q = query(
+        collection(db, 'cupones'),
+        where('codigo', '==', codigoLimpio),
+        where('activo', '==', true)
+      );
+      const resp = await getDocs(q);
+
+      if (resp.empty) {
+        setCuponAplicado(null);
+        setErrorCupon('Cupón inválido o inactivo.');
+        return;
+      }
+
+      setCuponAplicado(resp.docs[0].data());
+      setErrorCupon('');
+    } catch (err) {
+      console.error('Error al validar cupón:', err);
+      setErrorCupon('No se pudo verificar el cupón. Intentá nuevamente.');
+    } finally {
+      setValidandoCupon(false);
+    }
+  };
+
+  const handleQuitarCupon = () => {
+    setCuponAplicado(null);
+    setCodigoCupon('');
+    setErrorCupon('');
+  };
+
+  const handleVaciarCarrito = () => {
+    handleQuitarCupon();
+    clearCart();
+  };
 
   const handleFinalizarCompra = () => {
     if (cart.length === 0) return;
@@ -15,13 +71,17 @@ export const CarritoPage = () => {
       )
       .join('\n');
 
-    const textoWhatsApp = `¡Hola Osky Diseños! 👋\n\nQuiero finalizar la compra de los siguientes servicios:\n\n${mensajeServicios}\n\n💰 *Total:* $${totalPrice.toLocaleString('es-AR')} ARS\n\nQuedo a la espera para coordinar el pago y los detalles del proyecto. ¡Muchas gracias!`;
+    const detalleDescuento = cuponAplicado
+      ? `\nSubtotal: $${totalPrice.toLocaleString('es-AR')} ARS\n🎟️ *Cupón (${cuponAplicado.codigo} - ${cuponAplicado.descuento}% OFF):* -$${montoDescuento.toLocaleString('es-AR')} ARS\n`
+      : '\n';
+
+    const textoWhatsApp = `¡Hola Osky Diseños! 👋\n\nQuiero finalizar la compra de los siguientes servicios:\n\n${mensajeServicios}\n${detalleDescuento}💰 *Total a pagar:* $${totalConDescuento.toLocaleString('es-AR')} ARS\n\nQuedo a la espera para coordinar el pago y los detalles del proyecto. ¡Muchas gracias!`;
 
     const numeroTelefono = "5491123230175";
     const urlWhatsApp = `https://wa.me/${numeroTelefono}?text=${encodeURIComponent(textoWhatsApp)}`;
 
     window.open(urlWhatsApp, '_blank');
-    clearCart();
+    handleVaciarCarrito();
   };
 
   if (cart.length === 0) {
@@ -47,7 +107,10 @@ export const CarritoPage = () => {
         {cart.map((item) => (
           <div key={item.id} className="cart-item-card">
             <div className="cart-item-img-container">
-              <img src={`/${item.imagen}`} alt={item.nombre} />
+              <img
+                src={item.imagen?.startsWith('http') ? item.imagen : `/${item.imagen}`}
+                alt={item.nombre}
+              />
             </div>
 
             <div className="cart-item-info">
@@ -75,18 +138,73 @@ export const CarritoPage = () => {
       </div>
 
       <div className="cart-summary-box">
+        {/* Formulario para canjear cupón de descuento */}
+        <div style={{ marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+          <form onSubmit={handleAplicarCupon} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={codigoCupon}
+              onChange={(e) => setCodigoCupon(e.target.value)}
+              placeholder="Código de cupón (ej: OSKY15)"
+              aria-label="Código de cupón de descuento"
+              disabled={Boolean(cuponAplicado)}
+              style={{
+                padding: '10px 14px',
+                borderRadius: '6px',
+                border: '1px solid rgba(255,255,255,0.2)',
+                background: 'rgba(0,0,0,0.25)',
+                color: '#fff',
+                flex: '1',
+                minWidth: '200px'
+              }}
+            />
+            {!cuponAplicado ? (
+              <button type="submit" className="secondary-cta" disabled={validandoCupon}>
+                {validandoCupon ? 'Validando...' : 'Aplicar Cupón'}
+              </button>
+            ) : (
+              <button type="button" onClick={handleQuitarCupon} className="btn-delete-item" style={{ padding: '10px 14px' }}>
+                Quitar Cupón
+              </button>
+            )}
+          </form>
+
+          {errorCupon && (
+            <p style={{ color: '#ff6b6b', fontSize: '0.9rem', marginTop: '8px' }}>
+              ⚠️ {errorCupon}
+            </p>
+          )}
+
+          {cuponAplicado && (
+            <p style={{ color: '#4ade80', fontSize: '0.95rem', fontWeight: 'bold', marginTop: '8px' }}>
+              ✓ Cupón {cuponAplicado.codigo} aplicado ({cuponAplicado.descuento}% OFF — Ahorrás ${montoDescuento.toLocaleString('es-AR')} ARS)
+            </p>
+          )}
+        </div>
+
+        {cuponAplicado && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', opacity: 0.85 }}>
+            <span>Subtotal:</span>
+            <span>${totalPrice.toLocaleString('es-AR')} ARS</span>
+          </div>
+        )}
+
         <div className="cart-total-row">
           <span>Total a Pagar:</span>
-          <span className="cart-total-amount">${totalPrice.toLocaleString('es-AR')} ARS</span>
+          <span className="cart-total-amount">${totalConDescuento.toLocaleString('es-AR')} ARS</span>
         </div>
 
         <div className="cart-actions">
-          <button onClick={handleFinalizarCompra} className="cta-button main-cta" style={{ background: '#25D366', borderColor: '#25D366', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={handleFinalizarCompra}
+            className="cta-button main-cta"
+            style={{ background: '#25D366', borderColor: '#25D366', display: 'flex', alignItems: 'center', gap: '10px' }}
+          >
             <i className="fab fa-whatsapp" style={{ fontSize: '1.4rem' }}></i>
             Finalizar Compra
           </button>
 
-          <button onClick={clearCart} className="clear-cart-btn-secondary">
+          <button onClick={handleVaciarCarrito} className="clear-cart-btn-secondary">
             Vaciar todo el carrito
           </button>
         </div>

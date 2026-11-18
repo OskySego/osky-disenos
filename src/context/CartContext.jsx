@@ -1,6 +1,8 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 
 export const CartContext = createContext();
+
+export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
@@ -8,7 +10,6 @@ export const CartProvider = ({ children }) => {
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
-  // Estado para controlar el mensaje del cartel de aviso
   const [mensajeToast, setMensajeToast] = useState(null);
 
   useEffect(() => {
@@ -26,10 +27,7 @@ export const CartProvider = ({ children }) => {
       return [...prevCart, { ...item, quantity }];
     });
 
-    // Activar el cartel flotante de aviso
     setMensajeToast(`¡"${item.nombre}" se añadió al carrito! 🛒`);
-
-    // Ocultar el cartel automáticamente después de 3 segundos
     setTimeout(() => {
       setMensajeToast(null);
     }, 3000);
@@ -61,6 +59,17 @@ export const CartProvider = ({ children }) => {
     setCart([]);
   };
 
+  // NUEVO: Cantidad actual de un producto en el carrito (usando tu propiedad "quantity")
+  const getCantidadActual = (productId) => {
+    const item = cart.find((p) => p.id === productId);
+    return item ? item.quantity : 0;
+  };
+
+  // NUEVO: Verifica si el producto ya está agregado
+  const isInCart = (productId) => {
+    return cart.some((p) => p.id === productId);
+  };
+
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
   const totalPrice = cart.reduce((acc, item) => acc + item.precio * item.quantity, 0);
 
@@ -70,9 +79,12 @@ export const CartProvider = ({ children }) => {
         cart,
         addToCart,
         removeFromCart,
+        removeItem: removeFromCart, // Alias para compatibilidad con la consigna
         increaseQuantity,
         decreaseQuantity,
         clearCart,
+        getCantidadActual,
+        isInCart,
         totalItems,
         totalPrice,
         mensajeToast
