@@ -11,34 +11,55 @@ export const PerfilPage = () => {
     navigate('/');
   };
 
-  return (
-    <section style={{ maxWidth: '700px', margin: '0 auto', padding: '50px 20px', textAlign: 'center' }}>
-      <div className="box-card" style={{ padding: '30px' }}>
-        <h2>Mi Perfil</h2>
-        <p style={{ margin: '15px 0', fontSize: '1.1rem' }}>
-          <strong>Correo:</strong> {user?.email}
-        </p>
-        <p style={{ marginBottom: '25px' }}>
-          <strong>Rol de cuenta:</strong>{' '}
-          <span style={{ color: '#ffd700', textTransform: 'uppercase', fontWeight: 'bold' }}>
-            {rol}
-          </span>
-        </p>
+  const inicialUsuario = user?.email ? user.email.charAt(0).toUpperCase() : 'O';
 
+  return (
+    <section className="profile-page-section">
+      <div className="profile-card">
+        {/* Avatar con resplandor violeta */}
+        <div className="profile-avatar-circle">
+          <span>{inicialUsuario}</span>
+        </div>
+
+        <h2 className="profile-title">Mi Perfil</h2>
+        <p className="profile-subtitle">Panel de cuenta de Osky Diseños</p>
+
+        {/* Datos de la cuenta */}
+        <div className="profile-info-box">
+          <div className="profile-info-row">
+            <span className="profile-label">Correo electrónico</span>
+            <span className="profile-value">{user?.email}</span>
+          </div>
+
+          <div className="profile-info-row">
+            <span className="profile-label">Nivel de acceso</span>
+            <span className={`profile-role-badge ${rol === 'admin' ? 'is-admin' : ''}`}>
+              {rol === 'admin' ? '★ Administrador' : 'Cliente'}
+            </span>
+          </div>
+        </div>
+
+        {/* Accesos directos exclusivos para Administrador */}
         {rol === 'admin' && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', flexWrap: 'wrap', marginBottom: '25px' }}>
-            <Link to="/gestion" className="cta-button main-cta">
-              ⚙️ Gestionar Productos
-            </Link>
-            <Link to="/admin/cupones" className="cta-button secondary-cta">
-              🎟️ Gestionar Cupones
-            </Link>
+          <div className="profile-admin-panel">
+            <span className="profile-admin-heading">Herramientas de Administración</span>
+            <div className="profile-admin-actions">
+              <Link to="/gestion" className="cta-button main-cta">
+                ⚙️ Gestionar Productos
+              </Link>
+              <Link to="/admin/cupones" className="secondary-cta">
+                🎟️ Gestionar Cupones
+              </Link>
+            </div>
           </div>
         )}
 
-        <button onClick={handleLogout} className="btn-delete-item" style={{ padding: '10px 20px' }}>
-          Cerrar Sesión
-        </button>
+        {/* Acción de cierre de sesión */}
+        <div className="profile-footer-actions">
+          <button onClick={handleLogout} className="btn-logout-profile">
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
     </section>
   );
