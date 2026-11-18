@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { FormularioProducto } from '../components/FormularioProducto';
-import './GestionPage.css';
+import "../css/GestionPage.css";
 
 const moneda = new Intl.NumberFormat('es-AR', {
   style: 'currency',

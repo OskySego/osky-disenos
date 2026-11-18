@@ -1,0 +1,188 @@
+/* Osky Diseños — panel de gestión. Todos los estilos están aislados. */
+.gestion-dashboard {
+  --gestion-bg: #240442;
+  --gestion-panel: #210735;
+  --gestion-panel-2: #300c4d;
+  --gestion-border: rgba(233, 213, 255, .16);
+  --gestion-text: #f7efff;
+  --gestion-muted: #c4b3d8;
+  --gestion-gold: #efb847;
+  width: 100%;
+  max-width: none;
+  min-height: 100vh;
+  margin: 0;
+  padding: clamp(30px, 4vw, 64px) clamp(16px, 4vw, 64px) 80px;
+  background: radial-gradient(ellipse at 85% 5%, rgba(135, 72, 180, .22), transparent 45%), var(--gestion-bg);
+  color: var(--gestion-text);
+  font-family: 'Montserrat', system-ui, sans-serif;
+}
+.gestion-dashboard *, .gestion-dashboard *::before, .gestion-dashboard *::after { box-sizing: border-box; }
+.gestion-container { width: 100%; max-width: 1440px; margin: 0 auto; }
+.gestion-dashboard h1, .gestion-dashboard h2, .gestion-dashboard h3 {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  color: var(--gestion-text);
+  line-height: 1.2;
+  letter-spacing: -.035em;
+}
+.gestion-dashboard p { color: var(--gestion-muted); }
+.gestion-encabezado { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.gestion-eyebrow, .gestion-seccion-etiqueta {
+  display: block; color: var(--gestion-gold); font-size: .74rem; font-weight: 800;
+  letter-spacing: .13em; margin-bottom: 11px;
+}
+.gestion-encabezado h1 { font-size: clamp(1.9rem, 3.2vw, 3.2rem); margin: 0 0 10px; }
+.gestion-encabezado p { max-width: 690px; font-size: .98rem; margin: 0; }
+.gestion-ver-catalogo, .gestion-btn-actualizar, .gestion-btn-salir {
+  border: 1px solid var(--gestion-border); border-radius: 11px;
+  background: rgba(255,255,255,.035); color: var(--gestion-text); font: inherit;
+  font-size: .85rem; font-weight: 700; text-decoration: none;
+  padding: 12px 16px; cursor: pointer; transition: .2s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.gestion-ver-catalogo:hover, .gestion-btn-actualizar:hover, .gestion-btn-salir:hover { border-color: var(--gestion-gold); color: var(--gestion-gold); }
+.gestion-resumen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.gestion-resumen-card {
+  display: flex; align-items: center; gap: 15px; padding: 20px 22px;
+  border: 1px solid var(--gestion-border); border-radius: 16px;
+  background: linear-gradient(145deg, rgba(90, 32, 135, .3), rgba(31, 5, 49, .92));
+}
+.gestion-resumen-icono { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: rgba(239,184,71,.12); color: var(--gestion-gold); font-size: 1.5rem; }
+.gestion-resumen-card div { display: flex; flex-direction: column; min-width: 0; gap: 4px; }
+.gestion-resumen-card div span { color: var(--gestion-muted); font-size: .78rem; font-weight: 600; }
+.gestion-resumen-card strong { color: var(--gestion-text); font-size: 1.6rem; line-height: 1.2; }
+.gestion-aviso { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; border: 1px solid; font-size: .9rem; }
+.gestion-aviso--exito { color: #d7f9e2; background: rgba(24, 134, 77, .13); border-color: rgba(60, 190, 110, .4); }
+.gestion-aviso--error { color: #ffd5d5; background: rgba(205, 46, 69, .13); border-color: rgba(255, 100, 120, .4); }
+.gestion-aviso button { background: none; border: 0; color: inherit; font-size: 1.5rem; cursor: pointer; }
+.gestion-area-edicion { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(260px, .75fr); align-items: start; gap: 22px; scroll-margin-top: 115px; }
+.gestion-form-panel, .gestion-ayuda-card, .gestion-nota-card, .gestion-catalogo {
+  background: linear-gradient(155deg, #351053, #1d0731 85%);
+  border: 1px solid var(--gestion-border); border-radius: 19px;
+  box-shadow: 0 14px 32px rgba(7,0,21,.18);
+}
+.gestion-form-panel { min-width: 0; padding: clamp(20px, 2.5vw, 34px); }
+.gestion-panel-encabezado { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid var(--gestion-border); margin-bottom: 25px; }
+.gestion-panel-encabezado h2 { font-size: clamp(1.3rem, 2vw, 1.75rem); margin: 0 0 8px; }
+.gestion-panel-encabezado p { margin: 0; font-size: .88rem; }
+.gestion-btn-salir { white-space: nowrap; }
+/* Mejora el componente FormularioProducto sin alterar su lógica de Firebase. */
+.gestion-form-panel > :not(.gestion-panel-encabezado) { width: 100% !important; max-width: 100% !important; margin-inline: 0 !important; }
+/* Oculta solo el título antiguo si viene duplicado dentro del formulario. */
+.gestion-form-panel > :not(.gestion-panel-encabezado) > h2:first-child,
+.gestion-form-panel > :not(.gestion-panel-encabezado) > form > h2:first-child { display: none; }
+.gestion-form-panel :is(form, fieldset) { width: 100%; max-width: 100%; min-width: 0; }
+.gestion-form-panel fieldset { border: 0; padding: 0; }
+.gestion-form-panel label { display: block; color: #f4eafb; font-weight: 700; font-size: .87rem; margin-bottom: 8px; }
+.gestion-form-panel :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]), select, textarea) {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(206, 172, 237, .33) !important;
+  border-radius: 11px !important;
+  color: #f7efff !important;
+  background: rgba(17, 3, 31, .86) !important;
+  padding: 13px 15px !important;
+  font: inherit;
+  font-size: .94rem;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.gestion-form-panel :is(input, textarea)::placeholder { color: #aa95c5 !important; opacity: .8; }
+.gestion-form-panel :is(input, select, textarea):focus { border-color: var(--gestion-gold) !important; box-shadow: 0 0 0 3px rgba(239,184,71,.13); }
+.gestion-form-panel textarea { min-height: 112px; resize: vertical; }
+.gestion-form-panel select option { color: #fff; background: #210735; }
+.gestion-form-panel :is(button[type="submit"], .cta-button, .main-cta) {
+  background: var(--gestion-gold); border: 0; color: #280841;
+  border-radius: 12px; font-weight: 800; padding: 13px 23px; cursor: pointer;
+}
+.gestion-form-panel :is(button[type="submit"], .cta-button, .main-cta):hover { background: #ffd273; }
+.gestion-form-panel button:disabled { opacity: .55; cursor: not-allowed; }
+.gestion-aside { display: grid; gap: 18px; }
+.gestion-ayuda-card, .gestion-nota-card { padding: 26px; }
+.gestion-ayuda-card h3 { margin: 0 0 20px; font-size: 1.19rem; }
+.gestion-ayuda-card ol { margin: 0; padding-left: 20px; display: grid; gap: 15px; color: var(--gestion-muted); font-size: .88rem; line-height: 1.6; }
+.gestion-ayuda-card li::marker { color: var(--gestion-gold); font-weight: 800; }
+.gestion-ayuda-card strong { color: var(--gestion-text); }
+.gestion-nota-card { display: flex; align-items: flex-start; gap: 15px; background: rgba(239,184,71,.09); border-color: rgba(239,184,71,.25); }
+.gestion-nota-card > span { color: var(--gestion-gold); font-size: 1.6rem; }
+.gestion-nota-card strong { color: #f9ddab; font-size: .92rem; }
+.gestion-nota-card p { margin: 7px 0 0; font-size: .82rem; line-height: 1.6; }
+.gestion-catalogo { margin-top: 25px; padding: clamp(18px, 2.5vw, 32px); }
+.gestion-catalogo-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 22px; }
+.gestion-catalogo-header h2 { font-size: clamp(1.3rem, 2vw, 1.7rem); margin: 0; }
+.gestion-catalogo-header h2 span { color: var(--gestion-gold); }
+.gestion-btn-actualizar:disabled { opacity: .5; cursor: not-allowed; }
+.gestion-filtros { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 290px); gap: 12px; margin-bottom: 20px; }
+.gestion-busqueda { position: relative; display: block; }
+.gestion-busqueda > span[aria-hidden="true"] { position: absolute; top: 50%; left: 17px; transform: translateY(-50%); color: var(--gestion-muted); font-size: 1.5rem; }
+.gestion-filtros :is(input, select) { width: 100%; height: 46px; background: #1a062d; color: #f7efff; border: 1px solid var(--gestion-border); border-radius: 11px; padding: 0 15px; font: inherit; font-size: .87rem; }
+.gestion-filtros input { padding-left: 44px; }
+.gestion-filtros :is(input, select):focus-visible { outline: 2px solid var(--gestion-gold); outline-offset: 1px; }
+.gestion-resultado-cantidad { margin: 0 0 11px; color: var(--gestion-muted); font-size: .79rem; }
+.gestion-lista { display: grid; gap: 12px; }
+.gestion-item { display: grid; grid-template-columns: 84px minmax(180px, 1.5fr) minmax(145px, .7fr) auto; align-items: center; gap: 18px; padding: 15px; border-radius: 13px; border: 1px solid var(--gestion-border); background: rgba(12, 1, 23, .35); min-width: 0; }
+.gestion-item-imagen { position: relative; display: grid; place-items: center; width: 84px; height: 84px; overflow: hidden; border-radius: 11px; background: linear-gradient(140deg, #4e1a73, #19042d); color: var(--gestion-gold); font-size: 2rem; }
+.gestion-item-imagen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.gestion-item-detalle { min-width: 0; }
+.gestion-categoria { display: inline-block; color: var(--gestion-gold); font-size: .7rem; font-weight: 800; margin-bottom: 7px; }
+.gestion-item-detalle h3 { margin: 0 0 5px; font-size: .99rem; overflow-wrap: anywhere; letter-spacing: -.01em; }
+.gestion-item-detalle p { margin: 0; font-size: .78rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gestion-descripcion { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; } 
+.gestion-item-datos { display: flex; flex-direction: column; gap: 7px; }
+.gestion-item-datos strong { color: #fff3d6; font-size: .99rem; white-space: nowrap; }
+.gestion-stock { color: #c8b6de; font-size: .74rem; }
+.gestion-stock--cero { color: #ffa6a6; }
+.gestion-item-acciones { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+.gestion-btn-editar, .gestion-btn-eliminar, .gestion-estado button { padding: 10px 14px; border: 1px solid rgba(199,161,228,.35); border-radius: 9px; background: #371054; color: #f6ebff; font: inherit; font-weight: 700; font-size: .79rem; cursor: pointer; transition: .2s ease; }
+.gestion-btn-editar:hover, .gestion-estado button:hover { background: #572078; border-color: #9c65cb; }
+.gestion-btn-eliminar { background: rgba(171, 32, 55, .13); border-color: rgba(255, 114, 130, .32); color: #ffc1c9; }
+.gestion-btn-eliminar:hover { background: rgba(171, 32, 55, .38); }
+.gestion-estado { padding: 36px 20px; border: 1px dashed var(--gestion-border); border-radius: 13px; text-align: center; color: var(--gestion-muted); }
+.gestion-estado > span { display: block; color: var(--gestion-gold); font-size: 2.4rem; }
+.gestion-estado h3 { margin: 12px 0 6px; }
+.gestion-estado p { margin: 0 0 14px; font-size: .9rem; }
+.gestion-estado--error { color: #ffced4; border-color: rgba(255,100,100,.35); }
+.gestion-modal-fondo { position: fixed; z-index: 9999; inset: 0; background: rgba(9,0,18,.82); display: grid; place-items: center; padding: 18px; backdrop-filter: blur(8px); }
+.gestion-modal { width: min(100%, 440px); background: #2b0b43; border: 1px solid rgba(243,213,255,.2); box-shadow: 0 30px 80px rgba(0,0,0,.5); border-radius: 19px; padding: 30px; text-align: center; }
+.gestion-modal-icono { display: grid; place-items: center; width: 45px; height: 45px; margin: 0 auto 20px; border-radius: 50%; background: rgba(245,73,93,.18); color: #ffb3bf; font-size: 1.5rem; font-weight: 800; }
+.gestion-modal h2 { font-size: 1.45rem; margin-bottom: 12px; }
+.gestion-modal p { margin: 0; font-size: .9rem; line-height: 1.7; }
+.gestion-modal p strong { color: #fff; }
+.gestion-modal-acciones { display: flex; justify-content: center; gap: 12px; margin-top: 25px; }
+.gestion-btn-confirmar { background: #af3149; color: #fff; border-color: #c74f66; }
+.gestion-modal button:disabled { opacity: .5; cursor: not-allowed; }
+.gestion-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@media (max-width: 1080px) {
+  .gestion-area-edicion { grid-template-columns: minmax(0, 1fr); }
+  .gestion-aside { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .gestion-item { grid-template-columns: 74px minmax(0, 1fr) auto; }
+  .gestion-item-imagen { width: 74px; height: 74px; }
+  .gestion-item-datos { grid-column: 2; grid-row: 2; }
+  .gestion-item-acciones { grid-column: 3; grid-row: 1 / span 2; }
+}
+@media (max-width: 700px) {
+  .gestion-dashboard { padding: 26px 14px 55px; }
+  .gestion-encabezado { flex-direction: column; align-items: flex-start; }
+  .gestion-resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .gestion-resumen-card { padding: 14px; gap: 10px; }
+  .gestion-resumen-card:last-child { grid-column: 1 / -1; }
+  .gestion-resumen-icono { width: 38px; height: 38px; font-size: 1.1rem; }
+  .gestion-resumen-card div span { font-size: .7rem; }
+  .gestion-resumen-card strong { font-size: 1.35rem; }
+  .gestion-aside { grid-template-columns: minmax(0, 1fr); }
+  .gestion-ayuda-card, .gestion-nota-card { padding: 21px; }
+  .gestion-panel-encabezado { flex-direction: column; }
+  .gestion-filtros { grid-template-columns: 1fr; }
+  .gestion-item { grid-template-columns: 65px minmax(0, 1fr); gap: 12px; }
+  .gestion-item-imagen { width: 65px; height: 65px; }
+  .gestion-item-detalle { grid-column: 2; grid-row: 1; }
+  .gestion-item-datos { grid-column: 1 / -1; grid-row: 2; }
+  .gestion-item-acciones { grid-column: 1 / -1; grid-row: 3; justify-content: stretch; }
+  .gestion-item-acciones button { flex: 1; }
+  .gestion-catalogo-header { align-items: flex-start; }
+  .gestion-btn-actualizar { padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gestion-dashboard *, .gestion-dashboard *::before, .gestion-dashboard *::after { scroll-behavior: auto !important; transition: none !important; }
+}
