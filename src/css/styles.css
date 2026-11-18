@@ -1864,3 +1864,186 @@ main, .page-content {
     max-width: 230px;
   }
 }
+
+/* ============================================================
+   OSKY DISEÑOS — PORTADA EQUILIBRADA (revisión 2026)
+   Sustituye la distribución anterior sin cambiar otras páginas.
+   ============================================================ */
+.hero {
+  min-height: calc(100svh - 85px);
+  padding: clamp(36px, 5vw, 72px) 5%;
+  background: radial-gradient(circle at 78% 48%, rgba(120, 81, 169, 0.30) 0%, #330066 70%);
+}
+
+.hero-content {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  grid-template-areas:
+    "text media"
+    "buttons media";
+  align-items: center;
+  column-gap: clamp(28px, 5vw, 72px);
+  row-gap: 0;
+  text-align: left;
+}
+
+.hero-text {
+  grid-area: text;
+  min-width: 0;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.hero-image-container,
+.hero-content > .hero-main-image {
+  grid-area: media;
+  width: 100%;
+  max-width: 370px;
+  margin: 0 auto;
+  justify-self: center;
+}
+
+.hero-main-image {
+  display: block;
+  width: 100%;
+  max-width: 370px;
+  height: auto;
+  padding: 10px;
+  border-radius: 20px;
+}
+
+/* El título debe leerse completo incluso antes de terminar la carga. */
+.typewriter {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  white-space: normal;
+  overflow: visible;
+  border-right: 0;
+  animation: none;
+  text-align: left;
+  font-size: clamp(2rem, 3.3vw, 3.15rem);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  overflow-wrap: break-word;
+  margin-bottom: 1.2rem;
+}
+
+.hero .subtitle,
+.hero .highlight-text {
+  max-width: 570px;
+  font-size: clamp(1rem, 1.3vw, 1.18rem);
+  line-height: 1.65;
+}
+
+.hero-buttons,
+.hero-text .hero-buttons {
+  justify-content: flex-start;
+  margin-top: 1.7rem;
+  gap: 14px;
+}
+
+.hero-buttons .cta-button,
+.hero-buttons .secondary-cta {
+  min-height: 52px;
+}
+
+/* Tablets apaisadas: conserva las dos columnas mientras haya espacio. */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .hero-content {
+    grid-template-columns: minmax(0, 1.15fr) minmax(245px, 0.85fr);
+    column-gap: 26px;
+  }
+  .hero-main-image,
+  .hero-image-container,
+  .hero-content > .hero-main-image {
+    max-width: 315px;
+  }
+  .typewriter {
+    font-size: clamp(1.75rem, 3vw, 2.4rem);
+  }
+}
+
+/* Tablets y teléfonos: texto primero, imagen después. */
+@media (max-width: 900px) {
+  .hero {
+    min-height: auto;
+    padding: 52px 6% 64px;
+  }
+  .hero-content {
+    max-width: 680px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "text"
+      "buttons"
+      "media";
+    row-gap: 24px;
+    text-align: center;
+  }
+  .hero-text {
+    align-items: center;
+    text-align: center;
+  }
+  .hero-buttons,
+  .hero-text .hero-buttons {
+    justify-content: center;
+    margin-top: 1.25rem;
+  }
+  .hero-image-container,
+  .hero-content > .hero-main-image {
+    max-width: 275px;
+  }
+  .hero-main-image {
+    max-width: 275px;
+  }
+  .typewriter {
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    text-align: center;
+  }
+  .hero .subtitle,
+  .hero .highlight-text {
+    margin: 0.45rem auto;
+  }
+  /* Corrige el punto en que el menú horizontal ya no entra. */
+  .menu-toggle { display: block; }
+  .main-nav {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: radial-gradient(circle at center, rgba(120,81,169,.45), #330066 80%);
+    backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left .4s ease;
+    z-index: 1000;
+  }
+  .main-nav.open { left: 0; }
+  .main-nav ul { flex-direction: column; gap: 1.5rem; }
+  .main-nav a { font-size: 1.25rem; }
+}
+
+@media (max-width: 520px) {
+  .hero { padding: 42px 6% 56px; }
+  .hero-content { row-gap: 20px; }
+  .typewriter { font-size: clamp(1.7rem, 7vw, 2.1rem); }
+  .hero-image-container,
+  .hero-content > .hero-main-image,
+  .hero-main-image { max-width: 230px; }
+  .hero-buttons,
+  .hero-text .hero-buttons { flex-direction: column; align-items: center; gap: 12px; }
+  .hero-buttons .cta-button,
+  .hero-buttons .secondary-cta { width: 100%; max-width: 310px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-main-image,
+  .hero-buttons .cta-button,
+  .hero-buttons .secondary-cta { transition: none; }
+}
