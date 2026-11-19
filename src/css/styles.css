@@ -2132,3 +2132,48 @@ main, .page-content, .main-header, .main-footer, .hero {
     transition: none;
   }
 }
+
+/* LOGO ORIGINAL DE OSKY DISEÑOS */
+
+.hero-content > .hero-image-container {
+  width: 180px;
+  max-width: 180px;
+  margin: 0 auto 24px;
+  position: relative;
+  order: -1;
+}
+
+.hero .hero-main-image {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 18px;
+  border: 1px solid rgba(138, 43, 226, 0.6);
+  box-shadow: 0 0 30px rgba(138, 43, 226, 0.4);
+}
+
+/* Logo del menú superior */
+.main-header .header-logo {
+  width: auto;
+  height: 52px;
+  max-width: 130px;
+  object-fit: contain;
+}
+
+/* Adaptación a celulares */
+@media (max-width: 650px) {
+  .hero-content > .hero-image-container {
+    width: 125px;
+    max-width: 125px;
+  }
+
+  .hero .hero-main-image {
+    max-width: 125px;
+  }
+
+  .main-header .header-logo {
+    height: 42px;
+  }
+}

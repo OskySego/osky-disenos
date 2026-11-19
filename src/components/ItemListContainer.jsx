@@ -1,142 +1,232 @@
-import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { Item } from './Item';
 
-const LIMITE_POR_PAGINA = 6;
+const CANTIDAD_INICIAL = 9;
+
+const normalizarTexto = (valor) => String(valor ?? '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLocaleLowerCase('es-AR');
+
+const nombreCategoria = (producto) =>
+  String(producto.categoria ?? '').trim() || 'Sin categoría';
+
+const tieneDisponibilidad = (producto) => {
+  if (producto.stock === null || producto.stock === undefined || producto.stock === '') {
+    return true; // Un servicio sin cupos definidos no se marca como agotado.
+  }
+  const stock = Number(producto.stock);
+  return !Number.isFinite(stock) || stock > 0;
+};
+
+const precioNumerico = (producto) => {
+  if (producto.precio === '' || producto.precio === null || producto.precio === undefined) return null;
+  const valor = Number(producto.precio);
+  return Number.isFinite(valor) ? valor : null;
+};
 
 export const ItemListContainer = () => {
   const [productos, setProductos] = useState([]);
   const [busqueda, setBusqueda] = useState('');
-  const [ultimoDoc, setUltimoDoc] = useState(null);
-  const [hayMas, setHayMas] = useState(true);
+  const [categoria, setCategoria] = useState('todas');
+  const [orden, setOrden] = useState('nombre');
+  const [soloDisponibles, setSoloDisponibles] = useState(false);
+  const [cantidadVisible, setCantidadVisible] = useState(CANTIDAD_INICIAL);
   const [loading, setLoading] = useState(true);
-  const [cargandoMas, setCargandoMas] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
-  const cargarProductos = async (esSiguientePagina = false) => {
-    if (esSiguientePagina) {
-      setCargandoMas(true);
-    } else {
-      setLoading(true);
-      setError(null);
-    }
-
+  // Carga el catálogo completo para que la búsqueda contemple todos los servicios.
+  // Es adecuado para catálogos pequeños o medianos; para miles de registros,
+  // conviene pasar a búsqueda indexada en servidor.
+  const cargarProductos = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
-      const productosRef = collection(db, 'productos');
-      const consulta = esSiguientePagina && ultimoDoc
-        ? query(productosRef, orderBy('nombre'), startAfter(ultimoDoc), limit(LIMITE_POR_PAGINA))
-        : query(productosRef, orderBy('nombre'), limit(LIMITE_POR_PAGINA));
-
-      const resp = await getDocs(consulta);
-      const nuevosDocs = resp.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id
-      }));
-
-      setUltimoDoc(resp.docs[resp.docs.length - 1] || null);
-      setHayMas(resp.docs.length === LIMITE_POR_PAGINA);
-
-      if (esSiguientePagina) {
-        setProductos((prev) => [...prev, ...nuevosDocs]);
-      } else {
-        setProductos(nuevosDocs);
-      }
+      const respuesta = await getDocs(collection(db, 'productos'));
+      setProductos(respuesta.docs.map((documento) => ({
+        ...documento.data(),
+        id: documento.id,
+      })));
     } catch (err) {
-      console.error('Error al cargar productos:', err);
-      setError('No se pudo conectar con el catálogo en la nube.');
+      console.error('Error al cargar el catálogo de Osky Diseños:', err);
+      setError('No pudimos cargar los servicios. Revisá tu conexión e intentá nuevamente.');
     } finally {
       setLoading(false);
-      setCargandoMas(false);
     }
-  };
-
-  useEffect(() => {
-    cargarProductos(false);
   }, []);
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-        <p style={{ fontSize: '1.2rem', color: '#ffd700' }}>⏳ Cargando catálogo de servicios...</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    cargarProductos();
+  }, [cargarProductos]);
 
-  if (error) {
-    return (
-      <div style={{ textAlign: 'center', padding: '60px 20px', maxWidth: '500px', margin: '0 auto' }}>
-        <p style={{ fontSize: '1.2rem', color: '#ff6b6b' }}>⚠️ {error}</p>
-        <button onClick={() => cargarProductos(false)} className="cta-button main-cta" style={{ marginTop: '15px' }}>
-          Reintentar Cargar
-        </button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    setCantidadVisible(CANTIDAD_INICIAL);
+  }, [busqueda, categoria, orden, soloDisponibles]);
 
-  // Filtrado en tiempo real por nombre, categoría o descripción
-  const termino = busqueda.trim().toLowerCase();
-  const productosFiltrados = productos.filter(
-    (p) =>
-      p.nombre?.toLowerCase().includes(termino) ||
-      p.categoria?.toLowerCase().includes(termino) ||
-      p.descripcion?.toLowerCase().includes(termino)
-  );
+  const categorias = useMemo(() => {
+    return [...new Set(productos.map(nombreCategoria))]
+      .sort((a, b) => a.localeCompare(b, 'es-AR', { sensitivity: 'base' }));
+  }, [productos]);
 
-  const categorias = [...new Set(productosFiltrados.map((p) => p.categoria))];
+  const productosFiltrados = useMemo(() => {
+    const texto = normalizarTexto(busqueda.trim());
+    const filtrados = productos.filter((producto) => {
+      const coincideBusqueda = !texto || normalizarTexto([
+        producto.nombre,
+        producto.categoria,
+        producto.descripcion,
+      ].join(' ')).includes(texto);
+      const coincideCategoria = categoria === 'todas' || nombreCategoria(producto) === categoria;
+      const coincideStock = !soloDisponibles || tieneDisponibilidad(producto);
+      return coincideBusqueda && coincideCategoria && coincideStock;
+    });
+
+    filtrados.sort((a, b) => {
+      if (orden === 'precio-asc' || orden === 'precio-desc') {
+        const precioA = precioNumerico(a);
+        const precioB = precioNumerico(b);
+        if (precioA === null && precioB !== null) return 1;
+        if (precioB === null && precioA !== null) return -1;
+        if (precioA !== null && precioB !== null && precioA !== precioB) {
+          return orden === 'precio-asc' ? precioA - precioB : precioB - precioA;
+        }
+      }
+      return String(a.nombre ?? '').localeCompare(String(b.nombre ?? ''), 'es-AR', {
+        sensitivity: 'base',
+        numeric: true,
+      });
+    });
+    return filtrados;
+  }, [productos, busqueda, categoria, soloDisponibles, orden]);
+
+  const visibles = productosFiltrados.slice(0, cantidadVisible);
+  const hayMas = cantidadVisible < productosFiltrados.length;
+  const filtrosActivos = Boolean(busqueda.trim()) || categoria !== 'todas' || soloDisponibles || orden !== 'nombre';
+
+  const limpiarFiltros = () => {
+    setBusqueda('');
+    setCategoria('todas');
+    setSoloDisponibles(false);
+    setOrden('nombre');
+  };
 
   return (
-    <section id="productos-container">
-      {/* Barra de búsqueda en tiempo real */}
-      <div style={{ maxWidth: '500px', margin: '0 auto 35px', padding: '0 20px' }}>
-        <input
-          type="search"
-          aria-label="Buscar servicios o productos"
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="🔍 Buscar servicio, categoría o palabra clave..."
-          style={{
-            width: '100%',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: '1px solid rgba(255,215,0,0.4)',
-            background: 'rgba(255,255,255,0.08)',
-            color: '#fff',
-            fontSize: '1rem'
-          }}
-        />
+    <section className="catalogo-listado" id="catalogo-listado" aria-labelledby="catalogo-listado-titulo">
+      <div className="catalogo-listado__encabezado">
+        <div>
+          <span className="catalogo-listado__eyebrow">EXPLORÁ LO QUE CREAMOS</span>
+          <h2 id="catalogo-listado-titulo">Nuestros <em>servicios</em></h2>
+          <p>Encontrá la solución que mejor se adapte a tu proyecto.</p>
+        </div>
+        {!loading && !error && (
+          <span className="catalogo-listado__total" aria-label={`${productos.length} publicaciones en total`}>
+            {productos.length} {productos.length === 1 ? 'publicación' : 'publicaciones'}
+          </span>
+        )}
       </div>
 
-      {productosFiltrados.length === 0 ? (
-        <p style={{ textAlign: 'center', padding: '30px', opacity: 0.8 }}>
-          No se encontraron servicios que coincidan con "{busqueda}".
-        </p>
-      ) : (
-        categorias.map((cat) => (
-          <section key={cat} className="product-group" style={{ marginBottom: '40px' }}>
-            <h3 className="group-title">{cat}</h3>
-            <div className="card-grid">
-              {productosFiltrados
-                .filter((p) => p.categoria === cat)
-                .map((producto) => (
-                  <Item key={producto.id} item={producto} />
-                ))}
-            </div>
-          </section>
-        ))
-      )}
+      <div className="catalogo-filtros" role="search" aria-label="Filtros del catálogo">
+        <label className="catalogo-filtros__buscar">
+          <span className="catalogo-filtros__label">Buscar servicio</span>
+          <span className="catalogo-filtros__input-wrap">
+            <span className="catalogo-filtros__lupa" aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              value={busqueda}
+              onChange={(evento) => setBusqueda(evento.target.value)}
+              placeholder="Diseño web, logos, redes sociales..."
+            />
+          </span>
+        </label>
 
-      {/* Botón de paginación */}
-      {hayMas && !termino && (
-        <div style={{ textAlign: 'center', margin: '30px 0' }}>
-          <button
-            onClick={() => cargarProductos(true)}
-            className="cta-button secondary-cta"
-            disabled={cargandoMas}
-          >
-            {cargandoMas ? 'Cargando más...' : 'Cargar más servicios'}
+        <label className="catalogo-filtros__campo">
+          <span className="catalogo-filtros__label">Categoría</span>
+          <select value={categoria} onChange={(evento) => setCategoria(evento.target.value)}>
+            <option value="todas">Todas las categorías</option>
+            {categorias.map((nombre) => <option key={nombre} value={nombre}>{nombre}</option>)}
+          </select>
+        </label>
+
+        <label className="catalogo-filtros__campo">
+          <span className="catalogo-filtros__label">Ordenar por</span>
+          <select value={orden} onChange={(evento) => setOrden(evento.target.value)}>
+            <option value="nombre">Nombre (A a Z)</option>
+            <option value="precio-asc">Menor precio</option>
+            <option value="precio-desc">Mayor precio</option>
+          </select>
+        </label>
+      </div>
+
+      <div className="catalogo-filtros__inferior">
+        <label className="catalogo-disponibles">
+          <input
+            type="checkbox"
+            checked={soloDisponibles}
+            onChange={(evento) => setSoloDisponibles(evento.target.checked)}
+          />
+          <span>Solo con stock o cupos</span>
+        </label>
+        {filtrosActivos && (
+          <button type="button" className="catalogo-limpiar" onClick={limpiarFiltros}>
+            Limpiar filtros <span aria-hidden="true">×</span>
           </button>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="catalogo-cuadricula" aria-label="Cargando catálogo" role="status">
+          {Array.from({ length: 6 }, (_, indice) => (
+            <div className="catalogo-esqueleto" key={indice} aria-hidden="true">
+              <div className="catalogo-esqueleto__imagen" />
+              <div className="catalogo-esqueleto__linea" />
+              <div className="catalogo-esqueleto__linea catalogo-esqueleto__linea--corta" />
+              <div className="catalogo-esqueleto__linea" />
+            </div>
+          ))}
+          <span className="catalogo-solo-lector">Cargando servicios de Osky Diseños...</span>
         </div>
+      ) : error ? (
+        <div className="catalogo-vacio" role="alert">
+          <span className="catalogo-vacio__icono" aria-hidden="true">!</span>
+          <h3>No se pudo cargar el catálogo</h3>
+          <p>{error}</p>
+          <button type="button" className="catalogo-boton catalogo-boton--principal" onClick={cargarProductos}>Reintentar</button>
+        </div>
+      ) : (
+        <>
+          <p className="catalogo-resultados" aria-live="polite">
+            {productosFiltrados.length === 0
+              ? 'No hay resultados con estos filtros.'
+              : `Mostrando ${visibles.length} de ${productosFiltrados.length} ${productosFiltrados.length === 1 ? 'servicio' : 'servicios'}`}
+          </p>
+
+          {productosFiltrados.length === 0 ? (
+            <div className="catalogo-vacio">
+              <span className="catalogo-vacio__icono" aria-hidden="true">✧</span>
+              <h3>{productos.length === 0 ? 'Pronto vas a encontrar nuestros servicios acá' : 'No encontramos coincidencias'}</h3>
+              <p>{productos.length === 0 ? 'Estamos preparando el catálogo.' : 'Probá con otra palabra o cambiá los filtros.'}</p>
+              {filtrosActivos && <button type="button" className="catalogo-boton catalogo-boton--secundario" onClick={limpiarFiltros}>Mostrar todos</button>}
+            </div>
+          ) : (
+            <div className="catalogo-cuadricula">
+              {visibles.map((producto) => <Item key={producto.id} item={producto} />)}
+            </div>
+          )}
+
+          {hayMas && (
+            <div className="catalogo-cargar-mas">
+              <button
+                type="button"
+                className="catalogo-boton catalogo-boton--secundario"
+                onClick={() => setCantidadVisible((actual) => actual + CANTIDAD_INICIAL)}
+              >
+                Mostrar más servicios <span aria-hidden="true">↓</span>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );

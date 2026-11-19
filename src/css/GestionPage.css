@@ -202,3 +202,44 @@
 .gestion-ver-catalogo:hover {
   border-color: var(--gestion-amatista);
 }
+/* Vista previa de imagen dentro del formulario */
+.gestion-preview-box {
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(20, 0, 40, 0.65);
+  border: 1px dashed rgba(120, 81, 169, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 76px;
+}
+
+.gestion-preview-box img {
+  max-height: 90px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.gestion-preview-error {
+  font-size: 0.84rem;
+  color: #ff8080;
+}
+
+/* Etiquetas de características en la lista del catálogo */
+.gestion-caracteristicas-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.gestion-carac-tag {
+  font-size: 0.76rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(120, 81, 169, 0.22);
+  border: 1px solid rgba(235, 176, 69, 0.35);
+  color: #E6E6FA;
+}

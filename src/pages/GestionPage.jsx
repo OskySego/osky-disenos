@@ -16,9 +16,30 @@ const formatearPrecio = (valor) => {
   return Number.isFinite(numero) ? moneda.format(numero) : 'Precio a consultar';
 };
 
-const obtenerImagen = (producto) =>
-  [producto.imagen, producto.imagenUrl, producto.urlImagen, producto.imageUrl]
+const obtenerImagen = (producto) => {
+  const cruda = [producto.imagen, producto.imagenUrl, producto.urlImagen, producto.imageUrl]
     .find((valor) => typeof valor === 'string' && valor.trim().length > 0);
+
+  if (!cruda) return '';
+  const limpia = cruda.trim();
+  if (limpia.startsWith('http') || limpia.startsWith('data:') || limpia.startsWith('/')) {
+    return limpia;
+  }
+  return `/${limpia}`;
+};
+
+const obtenerCaracteristicas = (producto) => {
+  if (Array.isArray(producto.caracteristicas)) {
+    return producto.caracteristicas.map((c) => String(c).trim()).filter(Boolean);
+  }
+  if (typeof producto.caracteristicas === 'string' && producto.caracteristicas.trim()) {
+    return producto.caracteristicas
+      .split(/[\n,]+/)
+      .map((c) => c.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
 
 export const GestionPage = () => {
   const [productos, setProductos] = useState([]);
@@ -70,13 +91,16 @@ export const GestionPage = () => {
     const texto = busqueda.trim().toLocaleLowerCase('es-AR');
     return productos.filter((p) => {
       const coincideCategoria = categoria === 'todas' || p.categoria === categoria;
-      const contenido = `${p.nombre || ''} ${p.categoria || ''} ${p.descripcion || ''}`
+      const listaCarac = obtenerCaracteristicas(p).join(' ');
+      const contenido = `${p.nombre || ''} ${p.categoria || ''} ${p.descripcion || ''} ${listaCarac}`
         .toLocaleLowerCase('es-AR');
       return coincideCategoria && (!texto || contenido.includes(texto));
     });
   }, [productos, busqueda, categoria]);
 
-  const disponibles = productos.filter((p) => p.stock !== undefined && p.stock !== null && Number(p.stock) > 0).length;
+  const disponibles = productos.filter(
+    (p) => p.stock !== undefined && p.stock !== null && Number(p.stock) > 0
+  ).length;
 
   const editarProducto = (producto) => {
     setProductoAEditar(producto);
@@ -91,7 +115,7 @@ export const GestionPage = () => {
     setProductoAEditar(null);
     const actualizado = await cargarProductos();
     setMensaje(actualizado
-      ? { tipo: 'exito', texto: 'El catálogo se actualizó correctamente.' }
+      ? { tipo: 'exito', texto: 'El catálogo se actualizó correctamente en Firestore.' }
       : { tipo: 'error', texto: 'Se completó el formulario, pero no pudimos refrescar el catálogo.' });
   };
 
@@ -124,7 +148,9 @@ export const GestionPage = () => {
             <h1>Gestión del catálogo</h1>
             <p>Creá, actualizá y organizá tus productos y servicios desde un solo lugar.</p>
           </div>
-          <a className="gestion-ver-catalogo" href="#gestion-titulo-catalogo">Ir al catálogo actual <span aria-hidden="true">↗</span></a>
+          <a className="gestion-ver-catalogo" href="#gestion-titulo-catalogo">
+            Ir al catálogo actual <span aria-hidden="true">↗</span>
+          </a>
         </header>
 
         <div className="gestion-resumen" aria-label="Resumen del catálogo">
@@ -178,19 +204,19 @@ export const GestionPage = () => {
           <aside className="gestion-aside" aria-label="Recomendaciones de carga">
             <div className="gestion-ayuda-card">
               <span className="gestion-seccion-etiqueta">GUÍA RÁPIDA</span>
-              <h3>Una publicación que vende mejor</h3>
+              <h3>Reglas para cargar tus servicios</h3>
               <ol>
-                <li><strong>Nombre claro.</strong> Contá qué ofrecés en pocas palabras.</li>
-                <li><strong>Descripción útil.</strong> Incluí qué recibe el cliente.</li>
-                <li><strong>Precio actualizado.</strong> Revisá los valores antes de publicar.</li>
-                <li><strong>Imagen de calidad.</strong> Usá una foto o diseño legible.</li>
+                <li><strong>Precio entero.</strong> Escribilo sin signo $ ni puntos (ej. <code>135000</code>).</li>
+                <li><strong>Ruta de imagen.</strong> Usá el formato <code>img/archivo.jpg</code> sin barra inicial.</li>
+                <li><strong>Características.</strong> Separá cada entregable con coma o salto de línea.</li>
+                <li><strong>Cupos activos.</strong> Dejá <code>50</code> cupos en servicios digitales o a pedido.</li>
               </ol>
             </div>
             <div className="gestion-nota-card">
               <span aria-hidden="true">✦</span>
               <div>
-                <strong>Consejo para servicios</strong>
-                <p>Si ofrecés diseño web, branding u otros trabajos a pedido, indicá la disponibilidad como cupos y no como unidades físicas.</p>
+                <strong>Categorías del catálogo</strong>
+                <p>Diseño Web, Diseño Gráfico, Branding, Social Media, Volantes & Flyers y Tarjetas Personales.</p>
               </div>
             </div>
           </aside>
@@ -215,7 +241,7 @@ export const GestionPage = () => {
                 type="search"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar productos o servicios..."
+                placeholder="Buscar por nombre, categoría o característica..."
               />
             </label>
             <label className="gestion-filtro-categoria">
@@ -257,28 +283,65 @@ export const GestionPage = () => {
               <div className="gestion-lista">
                 {productosFiltrados.map((producto) => {
                   const imagen = obtenerImagen(producto);
+                  const caracteristicas = obtenerCaracteristicas(producto);
                   const cantidad = Number(producto.stock);
-                  const tieneCantidad = producto.stock !== undefined && producto.stock !== null && producto.stock !== '' && Number.isFinite(cantidad);
+                  const tieneCantidad =
+                    producto.stock !== undefined &&
+                    producto.stock !== null &&
+                    producto.stock !== '' &&
+                    Number.isFinite(cantidad);
+
                   return (
                     <article className="gestion-item" key={producto.id}>
                       <div className="gestion-item-imagen">
                         <span aria-hidden="true">✦</span>
-                        {imagen && <img src={imagen} alt={`Imagen de ${producto.nombre || 'producto'}`} loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />}
+                        {imagen && (
+                          <img
+                            src={imagen}
+                            alt={`Imagen de ${producto.nombre || 'producto'}`}
+                            loading="lazy"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        )}
                       </div>
+
                       <div className="gestion-item-detalle">
                         <span className="gestion-categoria">{producto.categoria || 'Sin categoría'}</span>
                         <h3>{producto.nombre || 'Sin nombre'}</h3>
                         {producto.descripcion && <p>{producto.descripcion}</p>}
+
+                        {caracteristicas.length > 0 && (
+                          <div className="gestion-caracteristicas-tags" aria-label="Características incluidas">
+                            {caracteristicas.map((item, idx) => (
+                              <span key={idx} className="gestion-carac-tag">
+                                ✓ {item}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
+
                       <div className="gestion-item-datos">
                         <strong>{formatearPrecio(producto.precio)}</strong>
                         <span className={`gestion-stock ${tieneCantidad && cantidad === 0 ? 'gestion-stock--cero' : ''}`}>
                           {tieneCantidad ? `Stock / cupos: ${cantidad}` : 'Disponibilidad sin definir'}
                         </span>
                       </div>
+
                       <div className="gestion-item-acciones">
-                        <button type="button" className="gestion-btn-editar" onClick={() => editarProducto(producto)}>Editar</button>
-                        <button type="button" className="gestion-btn-eliminar" onClick={() => setConfirmarEliminar(producto)} aria-label={`Eliminar ${producto.nombre || 'producto'}`}>Eliminar</button>
+                        <button type="button" className="gestion-btn-editar" onClick={() => editarProducto(producto)}>
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="gestion-btn-eliminar"
+                          onClick={() => setConfirmarEliminar(producto)}
+                          aria-label={`Eliminar ${producto.nombre || 'producto'}`}
+                        >
+                          Eliminar
+                        </button>
                       </div>
                     </article>
                   );
@@ -291,7 +354,13 @@ export const GestionPage = () => {
 
       {confirmarEliminar && (
         <div className="gestion-modal-fondo">
-          <div className="gestion-modal" role="dialog" aria-modal="true" aria-labelledby="gestion-modal-titulo" aria-describedby="gestion-modal-descripcion">
+          <div
+            className="gestion-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gestion-modal-titulo"
+            aria-describedby="gestion-modal-descripcion"
+          >
             <span className="gestion-modal-icono" aria-hidden="true">!</span>
             <h2 id="gestion-modal-titulo">¿Eliminar publicación?</h2>
             <p id="gestion-modal-descripcion">
@@ -299,8 +368,21 @@ export const GestionPage = () => {
               Esta acción no se puede deshacer.
             </p>
             <div className="gestion-modal-acciones">
-              <button type="button" className="gestion-btn-editar" onClick={() => setConfirmarEliminar(null)} disabled={eliminando} autoFocus>Cancelar</button>
-              <button type="button" className="gestion-btn-eliminar gestion-btn-confirmar" onClick={eliminarProducto} disabled={eliminando}>
+              <button
+                type="button"
+                className="gestion-btn-editar"
+                onClick={() => setConfirmarEliminar(null)}
+                disabled={eliminando}
+                autoFocus
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="gestion-btn-eliminar gestion-btn-confirmar"
+                onClick={eliminarProducto}
+                disabled={eliminando}
+              >
                 {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
               </button>
             </div>
