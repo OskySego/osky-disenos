@@ -1,68 +1,92 @@
-import React from 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { CartProvider } from './context/CartContext';
-import { AuthProvider } from './context/AuthContext';
+
+import { CartProvider } from './context/CartProvider';
+import { AuthProvider } from './context/AuthProvider';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
-import { Home } from './pages/Home';
-import { ProductosPage } from './pages/ProductosPage';
-import { ItemDetail } from './pages/ItemDetail';
-import { ResenasPage } from './pages/ResenasPage';
-import { ContactoPage } from './pages/ContactoPage';
-import { CarritoPage } from './pages/CarritoPage';
-import { GestionPage } from './pages/GestionPage';
-import { GestionCuponesPage } from './pages/GestionCuponesPage';
-import { LoginPage } from './pages/LoginPage';
-import { RegistroPage } from './pages/RegistroPage';
-import { PerfilPage } from './pages/PerfilPage';
 import './css/styles.css';
+
+// Carga cada página cuando el visitante accede a su ruta.
+// Las páginas existentes utilizan exportaciones con nombre.
+const Home = lazy(() => import('./pages/Home').then((m) => ({ default: m.Home })));
+const ProductosPage = lazy(() => import('./pages/ProductosPage').then((m) => ({ default: m.ProductosPage })));
+const ItemDetail = lazy(() => import('./pages/ItemDetail').then((m) => ({ default: m.ItemDetail })));
+const ResenasPage = lazy(() => import('./pages/ResenasPage').then((m) => ({ default: m.ResenasPage })));
+const ContactoPage = lazy(() => import('./pages/ContactoPage').then((m) => ({ default: m.ContactoPage })));
+const CarritoPage = lazy(() => import('./pages/CarritoPage').then((m) => ({ default: m.CarritoPage })));
+const GestionPage = lazy(() => import('./pages/GestionPage').then((m) => ({ default: m.GestionPage })));
+const GestionCuponesPage = lazy(() => import('./pages/GestionCuponesPage').then((m) => ({ default: m.GestionCuponesPage })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const RegistroPage = lazy(() => import('./pages/RegistroPage').then((m) => ({ default: m.RegistroPage })));
+const PerfilPage = lazy(() => import('./pages/PerfilPage').then((m) => ({ default: m.PerfilPage })));
+
+const PantallaCargando = () => (
+  <div
+    role="status"
+    aria-live="polite"
+    style={{
+      minHeight: '50vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '3rem 1rem',
+      color: 'var(--cyber-hielo, #F2F0F7)',
+      textAlign: 'center',
+    }}
+  >
+    Cargando Osky Diseños…
+  </div>
+);
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="productos" element={<ProductosPage />} />
-              <Route path="producto/:id" element={<ItemDetail />} />
-              <Route path="resenas" element={<ResenasPage />} />
-              <Route path="contacto" element={<ContactoPage />} />
-              <Route path="carrito" element={<CarritoPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="registro" element={<RegistroPage />} />
+          <Suspense fallback={<PantallaCargando />}>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="productos" element={<ProductosPage />} />
+                <Route path="producto/:id" element={<ItemDetail />} />
+                <Route path="resenas" element={<ResenasPage />} />
+                <Route path="contacto" element={<ContactoPage />} />
+                <Route path="carrito" element={<CarritoPage />} />
+                <Route path="login" element={<LoginPage />} />
+                <Route path="registro" element={<RegistroPage />} />
 
-              <Route
-                path="perfil"
-                element={
-                  <ProtectedRoute>
-                    <PerfilPage />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="perfil"
+                  element={
+                    <ProtectedRoute>
+                      <PerfilPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="gestion"
-                element={
-                  <ProtectedRoute rolesPermitidos={['admin']}>
-                    <GestionPage />
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="gestion"
+                  element={
+                    <ProtectedRoute rolesPermitidos={['admin']}>
+                      <GestionPage />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="admin/cupones"
-                element={
-                  <ProtectedRoute rolesPermitidos={['admin']}>
-                    <GestionCuponesPage />
-                  </ProtectedRoute>
-                }
-              />
-            </Route>
-          </Routes>
+                <Route
+                  path="admin/cupones"
+                  element={
+                    <ProtectedRoute rolesPermitidos={['admin']}>
+                      <GestionCuponesPage />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
+            </Routes>
+          </Suspense>
           <ToastContainer position="bottom-right" autoClose={2500} theme="dark" />
         </BrowserRouter>
       </CartProvider>

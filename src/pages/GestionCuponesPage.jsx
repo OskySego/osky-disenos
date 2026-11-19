@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -13,7 +13,18 @@ export const GestionCuponesPage = () => {
   };
 
   useEffect(() => {
-    cargarCupones();
+    let activo = true;
+    getDocs(collection(db, 'cupones'))
+      .then((resp) => {
+        if (activo) {
+          setCupones(resp.docs.map((d) => ({ ...d.data(), id: d.id })));
+        }
+      })
+      .catch((err) => {
+        if (activo) console.error('Error al obtener cupones:', err);
+      });
+
+    return () => { activo = false; };
   }, []);
 
   const handleCrearCupon = async (e) => {
@@ -28,12 +39,12 @@ export const GestionCuponesPage = () => {
 
     setCodigo('');
     setDescuento('');
-    cargarCupones();
+    await cargarCupones();
   };
 
   const handleEliminarCupon = async (id) => {
     await deleteDoc(doc(db, 'cupones', id));
-    cargarCupones();
+    await cargarCupones();
   };
 
   return (

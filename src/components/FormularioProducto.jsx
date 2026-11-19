@@ -1,5 +1,4 @@
-// src/components/FormularioProducto.jsx
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -22,40 +21,39 @@ const ESTADO_INICIAL = {
   caracteristicas: '',
 };
 
+// Prepara el formulario para crear o editar sin actualizar el estado desde useEffect.
+const crearEstadoFormulario = (producto) => {
+  if (!producto) return { ...ESTADO_INICIAL };
+
+  const caracteristicas = Array.isArray(producto.caracteristicas)
+    ? producto.caracteristicas.join(', ')
+    : producto.caracteristicas || '';
+
+  return {
+    nombre: producto.nombre || '',
+    categoria: producto.categoria || '',
+    precio: producto.precio !== undefined ? String(producto.precio) : '',
+    stock: producto.stock !== undefined ? String(producto.stock) : '50',
+    imagen: producto.imagen || '',
+    descripcion: producto.descripcion || '',
+    caracteristicas,
+  };
+};
+
 export const FormularioProducto = ({
   modoEdicion = false,
   productoAEditar = null,
   onGuardar,
   onCancelarEdicion,
 }) => {
-  const [form, setForm] = useState(ESTADO_INICIAL);
+  // El estado se calcula una sola vez al montar el formulario.
+  // GestionPage usa una key distinta al seleccionar otro producto.
+  const [form, setForm] = useState(() => crearEstadoFormulario(
+    modoEdicion && productoAEditar ? productoAEditar : null
+  ));
   const [guardando, setGuardando] = useState(false);
   const [errorForm, setErrorForm] = useState('');
   const [previewValida, setPreviewValida] = useState(true);
-
-  useEffect(() => {
-    if (modoEdicion && productoAEditar) {
-      const caracTexto = Array.isArray(productoAEditar.caracteristicas)
-        ? productoAEditar.caracteristicas.join(', ')
-        : productoAEditar.caracteristicas || '';
-
-      setForm({
-        nombre: productoAEditar.nombre || '',
-        categoria: productoAEditar.categoria || '',
-        precio: productoAEditar.precio !== undefined ? String(productoAEditar.precio) : '',
-        stock: productoAEditar.stock !== undefined ? String(productoAEditar.stock) : '50',
-        imagen: productoAEditar.imagen || '',
-        descripcion: productoAEditar.descripcion || '',
-        caracteristicas: caracTexto,
-      });
-      setPreviewValida(true);
-      setErrorForm('');
-    } else {
-      setForm(ESTADO_INICIAL);
-      setPreviewValida(true);
-      setErrorForm('');
-    }
-  }, [modoEdicion, productoAEditar]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

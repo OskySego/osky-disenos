@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
@@ -6,6 +6,11 @@ import { CartContext } from '../context/CartContext';
 
 export const ItemDetail = () => {
   const { id } = useParams();
+  // Al cambiar de servicio se reinicia el estado del detalle.
+  return <ItemDetailContenido key={id} id={id} />;
+};
+
+const ItemDetailContenido = ({ id }) => {
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,25 +19,22 @@ export const ItemDetail = () => {
   const { addToCart } = useContext(CartContext);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    setCantidad(1);
-
-    const docRef = doc(db, 'productos', id);
-
-    getDoc(docRef)
+    let activo = true;
+    getDoc(doc(db, 'productos', id))
       .then((resp) => {
+        if (!activo) return;
         if (!resp.exists()) {
           throw new Error('El servicio o producto solicitado no existe.');
         }
         setProducto({ ...resp.data(), id: resp.id });
       })
       .catch((err) => {
-        setError(err.message || 'No se pudo cargar el detalle del servicio.');
+        if (activo) setError(err.message || 'No se pudo cargar el detalle del servicio.');
       })
       .finally(() => {
-        setLoading(false);
+        if (activo) setLoading(false);
       });
+    return () => { activo = false; };
   }, [id]);
 
   const handleAddToCart = () => {

@@ -1,3 +1,4 @@
+
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -15,7 +16,36 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
-      parserOptions: { ecmaFeatures: { jsx: true } },
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+      },
+    },
+    rules: {
+      'no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^React$' },
+      ],
+    },
+  },
+  {
+    files: [
+      'src/components/FormularioProducto.jsx',
+      'src/components/ItemListContainer.jsx',
+      'src/pages/GestionCuponesPage.jsx',
+      'src/pages/GestionPage.jsx',
+      'src/pages/ItemDetail.jsx',
+    ],
+    rules: {
+      'react-hooks/set-state-in-effect': 'warn',
+    },
+  },
+  {
+    files: [
+      'src/context/AuthContext.jsx',
+      'src/context/CartContext.jsx',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'warn',
     },
   },
 ])

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { Item } from './Item';
@@ -27,6 +27,14 @@ const precioNumerico = (producto) => {
   return Number.isFinite(valor) ? valor : null;
 };
 
+const obtenerProductos = async () => {
+  const respuesta = await getDocs(collection(db, 'productos'));
+  return respuesta.docs.map((documento) => ({
+    ...documento.data(),
+    id: documento.id,
+  }));
+};
+
 export const ItemListContainer = () => {
   const [productos, setProductos] = useState([]);
   const [busqueda, setBusqueda] = useState('');
@@ -40,15 +48,12 @@ export const ItemListContainer = () => {
   // Carga el catálogo completo para que la búsqueda contemple todos los servicios.
   // Es adecuado para catálogos pequeños o medianos; para miles de registros,
   // conviene pasar a búsqueda indexada en servidor.
+  // Solo se invoca desde el botón Reintentar (evento del usuario).
   const cargarProductos = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const respuesta = await getDocs(collection(db, 'productos'));
-      setProductos(respuesta.docs.map((documento) => ({
-        ...documento.data(),
-        id: documento.id,
-      })));
+      setProductos(await obtenerProductos());
     } catch (err) {
       console.error('Error al cargar el catálogo de Osky Diseños:', err);
       setError('No pudimos cargar los servicios. Revisá tu conexión e intentá nuevamente.');
@@ -57,13 +62,44 @@ export const ItemListContainer = () => {
     }
   }, []);
 
+  // La consulta inicial no actualiza estado sincrónicamente dentro del efecto.
+  // La bandera evita actualizar un componente que ya fue desmontado.
   useEffect(() => {
-    cargarProductos();
-  }, [cargarProductos]);
+    let activo = true;
 
-  useEffect(() => {
+    obtenerProductos()
+      .then((datos) => {
+        if (activo) setProductos(datos);
+      })
+      .catch((err) => {
+        if (!activo) return;
+        console.error('Error al cargar el catálogo de Osky Diseños:', err);
+        setError('No pudimos cargar los servicios. Revisá tu conexión e intentá nuevamente.');
+      })
+      .finally(() => {
+        if (activo) setLoading(false);
+      });
+
+    return () => { activo = false; };
+  }, []);
+
+  // Reiniciar la cantidad visible desde los eventos, no desde useEffect.
+  const actualizarBusqueda = (valor) => {
+    setBusqueda(valor);
     setCantidadVisible(CANTIDAD_INICIAL);
-  }, [busqueda, categoria, orden, soloDisponibles]);
+  };
+  const actualizarCategoria = (valor) => {
+    setCategoria(valor);
+    setCantidadVisible(CANTIDAD_INICIAL);
+  };
+  const actualizarOrden = (valor) => {
+    setOrden(valor);
+    setCantidadVisible(CANTIDAD_INICIAL);
+  };
+  const actualizarDisponibilidad = (valor) => {
+    setSoloDisponibles(valor);
+    setCantidadVisible(CANTIDAD_INICIAL);
+  };
 
   const categorias = useMemo(() => {
     return [...new Set(productos.map(nombreCategoria))]
@@ -110,6 +146,7 @@ export const ItemListContainer = () => {
     setCategoria('todas');
     setSoloDisponibles(false);
     setOrden('nombre');
+    setCantidadVisible(CANTIDAD_INICIAL);
   };
 
   return (
@@ -135,7 +172,7 @@ export const ItemListContainer = () => {
             <input
               type="search"
               value={busqueda}
-              onChange={(evento) => setBusqueda(evento.target.value)}
+              onChange={(evento) => actualizarBusqueda(evento.target.value)}
               placeholder="Diseño web, logos, redes sociales..."
             />
           </span>
@@ -143,7 +180,7 @@ export const ItemListContainer = () => {
 
         <label className="catalogo-filtros__campo">
           <span className="catalogo-filtros__label">Categoría</span>
-          <select value={categoria} onChange={(evento) => setCategoria(evento.target.value)}>
+          <select value={categoria} onChange={(evento) => actualizarCategoria(evento.target.value)}>
             <option value="todas">Todas las categorías</option>
             {categorias.map((nombre) => <option key={nombre} value={nombre}>{nombre}</option>)}
           </select>
@@ -151,7 +188,7 @@ export const ItemListContainer = () => {
 
         <label className="catalogo-filtros__campo">
           <span className="catalogo-filtros__label">Ordenar por</span>
-          <select value={orden} onChange={(evento) => setOrden(evento.target.value)}>
+          <select value={orden} onChange={(evento) => actualizarOrden(evento.target.value)}>
             <option value="nombre">Nombre (A a Z)</option>
             <option value="precio-asc">Menor precio</option>
             <option value="precio-desc">Mayor precio</option>
@@ -164,7 +201,7 @@ export const ItemListContainer = () => {
           <input
             type="checkbox"
             checked={soloDisponibles}
-            onChange={(evento) => setSoloDisponibles(evento.target.checked)}
+            onChange={(evento) => actualizarDisponibilidad(evento.target.checked)}
           />
           <span>Solo con stock o cupos</span>
         </label>

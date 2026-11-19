@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { CartContext } from '../context/CartContext';
+import '../css/CarritoPremium.css';
+
 const moneda = new Intl.NumberFormat('es-AR', {
   style: 'currency',
   currency: 'ARS',

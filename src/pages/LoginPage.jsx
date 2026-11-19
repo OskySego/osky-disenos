@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -19,7 +19,7 @@ export const LoginPage = () => {
     try {
       await login(email, password);
       navigate('/perfil');
-    } catch (err) {
+    } catch {
       setError('Correo o contraseña incorrectos.');
     } finally {
       setCargando(false);
@@ -37,7 +37,6 @@ export const LoginPage = () => {
             <label htmlFor="login-email">Correo electrónico</label>
             <input id="login-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="tu@email.com" />
           </div>
-
           <div className="form-group">
             <label htmlFor="login-pass">Contraseña</label>
             <input id="login-pass" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••" />
