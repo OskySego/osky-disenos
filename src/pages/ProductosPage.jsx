@@ -1,8 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ItemListContainer } from '../components/ItemListContainer';
-import '../css/CatalogoPremium.css';
-
 // Este componente usa las rutas reales de App.jsx: /productos y /contacto.
 export const ProductosPage = () => {
   return (

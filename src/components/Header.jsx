@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { NavBar } from './NavBar';
 import { CartWidget } from './CartWidget';
 import { CartContext } from '../context/CartContext';
-import '../css/HeaderPremium.css';
-
 export const Header = () => {
   const { mensajeToast } = useContext(CartContext);
   const [menuOpen, setMenuOpen] = useState(false);

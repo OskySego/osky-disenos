@@ -1,0 +1,35 @@
+/* ==========================================================================
+   OSKY DISEÑOS - ALQUIMIA CYBERPUNK ORGÁNICA - V4.0
+   Paleta de marca y alias de compatibilidad con los estilos existentes
+   ========================================================================= */
+:root {
+  /* Los cinco colores principales */
+  --cyber-abisal: #1E0B36;
+  --cyber-amatista: #8A2BE2;
+  --cyber-lima: #CCFF00;
+  --cyber-terracota: #D97757;
+  --cyber-hielo: #F2F0F7;
+
+  /* Superficies y componentes derivados de la paleta */
+  --cyber-sombra: #10061E;
+  --cyber-superficie: #291343;
+  --cyber-superficie-elevada: #32194E;
+  --cyber-texto-suave: rgba(242, 240, 247, 0.76);
+  --cyber-borde: rgba(138, 43, 226, 0.36);
+  --cyber-glow-amatista: rgba(138, 43, 226, 0.32);
+  --cyber-glow-lima: rgba(204, 255, 0, 0.26);
+
+  /* Nombres heredados: no romper clases que ya existen en la web */
+  --violeta-profundo: var(--cyber-abisal);
+  --sombra-extrema: var(--cyber-sombra);
+  --violeta-real: var(--cyber-amatista);
+  --penumbra-media: rgba(138, 43, 226, 0.17);
+  --penumbra-borde: var(--cyber-borde);
+  --lavanda-palido: var(--cyber-hielo);
+  --lavanda-tenue: var(--cyber-texto-suave);
+  --oro-base: var(--cyber-lima);
+  --oro-destello: var(--cyber-lima);
+  --glow-violeta: var(--cyber-glow-amatista);
+  --glow-oro: var(--cyber-glow-lima);
+}
+
