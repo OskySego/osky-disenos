@@ -1,214 +1,241 @@
 import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { CartContext } from '../context/CartContext';
+import '../css/CarritoPremium.css';
+
+const moneda = new Intl.NumberFormat('es-AR', {
+  style: 'currency',
+  currency: 'ARS',
+  maximumFractionDigits: 0,
+});
+
+const dinero = (valor) => moneda.format(Number(valor) || 0);
+
+const obtenerImagen = (imagen) => {
+  const ruta = typeof imagen === 'string' ? imagen.trim() : '';
+  if (!ruta) return '/img/logo-osky.png';
+  if (/^(https?:\/\/|data:|blob:|\/)/i.test(ruta)) return ruta;
+  return `/${ruta}`;
+};
 
 export const CarritoPage = () => {
-  const { cart, increaseQuantity, decreaseQuantity, removeFromCart, clearCart, totalPrice } = useContext(CartContext);
+  const {
+    cart,
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
+    totalPrice,
+  } = useContext(CartContext);
 
   const [codigoCupon, setCodigoCupon] = useState('');
   const [cuponAplicado, setCuponAplicado] = useState(null);
   const [errorCupon, setErrorCupon] = useState('');
   const [validandoCupon, setValidandoCupon] = useState(false);
+  const [confirmarVaciar, setConfirmarVaciar] = useState(false);
 
-  const montoDescuento = cuponAplicado ? (totalPrice * cuponAplicado.descuento) / 100 : 0;
-  const totalConDescuento = totalPrice - montoDescuento;
+  const cantidadProductos = cart.reduce((acum, item) => acum + (Number(item.quantity) || 0), 0);
+  const descuentoPorcentaje = Number(cuponAplicado?.descuento) || 0;
+  const descuento = (totalPrice * descuentoPorcentaje) / 100;
+  const total = Math.max(0, totalPrice - descuento);
 
-  const handleAplicarCupon = async (e) => {
-    e.preventDefault();
-    setErrorCupon('');
-
-    const codigoLimpio = codigoCupon.trim().toUpperCase();
-    if (!codigoLimpio) {
-      setErrorCupon('Ingresá un código de cupón.');
-      return;
-    }
-
-    setValidandoCupon(true);
-    try {
-      const q = query(
-        collection(db, 'cupones'),
-        where('codigo', '==', codigoLimpio),
-        where('activo', '==', true)
-      );
-      const resp = await getDocs(q);
-
-      if (resp.empty) {
-        setCuponAplicado(null);
-        setErrorCupon('Cupón inválido o inactivo.');
-        return;
-      }
-
-      setCuponAplicado(resp.docs[0].data());
-      setErrorCupon('');
-    } catch (err) {
-      console.error('Error al validar cupón:', err);
-      setErrorCupon('No se pudo verificar el cupón. Intentá nuevamente.');
-    } finally {
-      setValidandoCupon(false);
-    }
-  };
-
-  const handleQuitarCupon = () => {
+  const quitarCupon = () => {
     setCuponAplicado(null);
     setCodigoCupon('');
     setErrorCupon('');
   };
 
-  const handleVaciarCarrito = () => {
-    handleQuitarCupon();
+  const aplicarCupon = async (evento) => {
+    evento.preventDefault();
+    if (validandoCupon) return;
+    const codigo = codigoCupon.trim().toUpperCase();
+    setErrorCupon('');
+    if (!codigo) {
+      setErrorCupon('Ingresá un código de descuento.');
+      return;
+    }
+
+    setValidandoCupon(true);
+    try {
+      const consulta = query(
+        collection(db, 'cupones'),
+        where('codigo', '==', codigo),
+        where('activo', '==', true),
+      );
+      const respuesta = await getDocs(consulta);
+      if (respuesta.empty) {
+        setCuponAplicado(null);
+        setErrorCupon('El cupón no existe o no está activo.');
+        return;
+      }
+
+      const cupon = respuesta.docs[0].data();
+      const porcentaje = Number(cupon.descuento);
+      if (!Number.isFinite(porcentaje) || porcentaje <= 0 || porcentaje > 100) {
+        setCuponAplicado(null);
+        setErrorCupon('El descuento configurado no es válido.');
+        return;
+      }
+
+      setCuponAplicado({ codigo, descuento: porcentaje });
+    } catch (error) {
+      console.error('Error al consultar el cupón:', error);
+      setErrorCupon('No pudimos comprobar el cupón. Probá nuevamente.');
+    } finally {
+      setValidandoCupon(false);
+    }
+  };
+
+  const mensajeProductos = cart.map((item) => {
+    const cantidad = Number(item.quantity) || 1;
+    const subtotal = (Number(item.precio) || 0) * cantidad;
+    return `• *${item.nombre}* (x${cantidad}) — ${dinero(subtotal)}`;
+  }).join('\n');
+
+  const mensajeCupon = cuponAplicado
+    ? `\nSubtotal: ${dinero(totalPrice)}\n🎟️ Cupón ${cuponAplicado.codigo} (${descuentoPorcentaje}%): -${dinero(descuento)}\n`
+    : '\n';
+
+  const mensajeWhatsApp = `¡Hola Osky Diseños! 👋\n\nQuisiera consultar por este pedido:\n\n${mensajeProductos}\n${mensajeCupon}\n*Total estimado:* ${dinero(total)}\n\nQuedo a la espera para coordinar disponibilidad, detalles y forma de pago. ¡Muchas gracias!`;
+  const whatsappHref = `https://wa.me/5491123230175?text=${encodeURIComponent(mensajeWhatsApp)}`;
+
+  const vaciar = () => {
     clearCart();
+    quitarCupon();
+    setConfirmarVaciar(false);
   };
-
-  const handleFinalizarCompra = () => {
-    if (cart.length === 0) return;
-
-    const mensajeServicios = cart
-      .map(
-        (item) =>
-          `• *${item.nombre}* (x${item.quantity}) - $${(item.precio * item.quantity).toLocaleString('es-AR')} ARS`
-      )
-      .join('\n');
-
-    const detalleDescuento = cuponAplicado
-      ? `\nSubtotal: $${totalPrice.toLocaleString('es-AR')} ARS\n🎟️ *Cupón (${cuponAplicado.codigo} - ${cuponAplicado.descuento}% OFF):* -$${montoDescuento.toLocaleString('es-AR')} ARS\n`
-      : '\n';
-
-    const textoWhatsApp = `¡Hola Osky Diseños! 👋\n\nQuiero finalizar la compra de los siguientes servicios:\n\n${mensajeServicios}\n${detalleDescuento}💰 *Total a pagar:* $${totalConDescuento.toLocaleString('es-AR')} ARS\n\nQuedo a la espera para coordinar el pago y los detalles del proyecto. ¡Muchas gracias!`;
-
-    const numeroTelefono = "5491123230175";
-    const urlWhatsApp = `https://wa.me/${numeroTelefono}?text=${encodeURIComponent(textoWhatsApp)}`;
-
-    window.open(urlWhatsApp, '_blank');
-    handleVaciarCarrito();
-  };
-
-  if (cart.length === 0) {
-    return (
-      <section className="cart-page-container" style={{ textAlign: 'center', padding: '60px 20px' }}>
-        <h2>Tu carrito está vacío 🛒</h2>
-        <p style={{ margin: '15px 0', opacity: 0.8 }}>Todavía no agregaste ningún servicio a tu pedido.</p>
-        <Link to="/productos" className="cta-button main-cta" style={{ display: 'inline-block', marginTop: '10px' }}>
-          Explorar Servicios
-        </Link>
-      </section>
-    );
-  }
 
   return (
-    <section className="cart-page-container">
-      <div className="cart-header">
-        <h2>Tu Carrito de Compras</h2>
-        <span style={{ color: '#ffd700', fontWeight: 'bold' }}>{cart.length} servicio(s) seleccionado(s)</span>
-      </div>
-
-      <div className="cart-items-list">
-        {cart.map((item) => (
-          <div key={item.id} className="cart-item-card">
-            <div className="cart-item-img-container">
-              <img
-                src={item.imagen?.startsWith('http') ? item.imagen : `/${item.imagen}`}
-                alt={item.nombre}
-              />
-            </div>
-
-            <div className="cart-item-info">
-              <h4 className="cart-item-title">{item.nombre}</h4>
-              <p className="cart-item-price">${item.precio.toLocaleString('es-AR')} ARS c/u</p>
-            </div>
-
-            <div className="cart-qty-controls">
-              <button onClick={() => decreaseQuantity(item.id)} className="btn-qty" title="Restar">-</button>
-              <span className="qty-num">{item.quantity}</span>
-              <button onClick={() => increaseQuantity(item.id)} className="btn-qty" title="Sumar">+</button>
-            </div>
-
-            <div style={{ textAlign: 'right', minWidth: '110px' }}>
-              <span style={{ fontWeight: 'bold', color: '#fff', fontSize: '1.05rem', display: 'block' }}>
-                ${(item.precio * item.quantity).toLocaleString('es-AR')}
-              </span>
-            </div>
-
-            <button onClick={() => removeFromCart(item.id)} className="btn-delete-item" title="Eliminar servicio">
-              <i className="fas fa-trash"></i>
-            </button>
+    <section className="osky-checkout">
+      <div className="osky-checkout__contenedor">
+        <div className="osky-checkout__encabezado">
+          <div>
+            <span className="osky-checkout__eyebrow">TU SELECCIÓN · OSKY DISEÑOS</span>
+            <h1>Tu carrito <span>de proyectos</span></h1>
+            <p>Revisá los servicios, ajustá las cantidades y enviá tu consulta cuando estés listo.</p>
           </div>
-        ))}
-      </div>
-
-      <div className="cart-summary-box">
-        {/* Formulario para canjear cupón de descuento */}
-        <div style={{ marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-          <form onSubmit={handleAplicarCupon} style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <input
-              type="text"
-              value={codigoCupon}
-              onChange={(e) => setCodigoCupon(e.target.value)}
-              placeholder="Código de cupón (ej: OSKY15)"
-              aria-label="Código de cupón de descuento"
-              disabled={Boolean(cuponAplicado)}
-              style={{
-                padding: '10px 14px',
-                borderRadius: '6px',
-                border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(0,0,0,0.25)',
-                color: '#fff',
-                flex: '1',
-                minWidth: '200px'
-              }}
-            />
-            {!cuponAplicado ? (
-              <button type="submit" className="secondary-cta" disabled={validandoCupon}>
-                {validandoCupon ? 'Validando...' : 'Aplicar Cupón'}
-              </button>
-            ) : (
-              <button type="button" onClick={handleQuitarCupon} className="btn-delete-item" style={{ padding: '10px 14px' }}>
-                Quitar Cupón
-              </button>
-            )}
-          </form>
-
-          {errorCupon && (
-            <p style={{ color: '#ff6b6b', fontSize: '0.9rem', marginTop: '8px' }}>
-              ⚠️ {errorCupon}
-            </p>
-          )}
-
-          {cuponAplicado && (
-            <p style={{ color: '#4ade80', fontSize: '0.95rem', fontWeight: 'bold', marginTop: '8px' }}>
-              ✓ Cupón {cuponAplicado.codigo} aplicado ({cuponAplicado.descuento}% OFF — Ahorrás ${montoDescuento.toLocaleString('es-AR')} ARS)
-            </p>
-          )}
+          <Link className="osky-checkout__seguir" to="/productos">← Seguir explorando</Link>
         </div>
 
-        {cuponAplicado && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', opacity: 0.85 }}>
-            <span>Subtotal:</span>
-            <span>${totalPrice.toLocaleString('es-AR')} ARS</span>
+        {cart.length === 0 ? (
+          <div className="osky-checkout__vacio">
+            <span className="osky-checkout__vacio-icono" aria-hidden="true">✧</span>
+            <h2>Tu próxima gran idea empieza acá</h2>
+            <p>Por ahora no agregaste servicios. Explorá el catálogo y elegí los que necesitás para tu marca.</p>
+            <Link className="osky-checkout__boton osky-checkout__boton--primario" to="/productos">
+              Explorar servicios <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="osky-checkout__columnas">
+            <div className="osky-checkout__listado">
+              <div className="osky-checkout__seccion-head">
+                <div>
+                  <span className="osky-checkout__eyebrow">SERVICIOS ELEGIDOS</span>
+                  <h2>Tu selección <span>({cantidadProductos})</span></h2>
+                </div>
+                <button type="button" className="osky-checkout__vaciar" onClick={() => setConfirmarVaciar(true)}>
+                  Vaciar carrito
+                </button>
+              </div>
+
+              <div className="osky-checkout__items">
+                {cart.map((item) => {
+                  const cantidad = Number(item.quantity) || 1;
+                  const precio = Number(item.precio) || 0;
+                  const stock = Number(item.stock);
+                  const hayLimite = item.stock !== null && item.stock !== undefined && item.stock !== '' && Number.isFinite(stock);
+                  return (
+                    <article className="osky-checkout__item" key={item.id}>
+                      <Link className="osky-checkout__item-img" to={`/producto/${item.id}`} aria-label={`Ver ${item.nombre}`}>
+                        <img
+                          src={obtenerImagen(item.imagen)}
+                          alt={item.nombre}
+                          loading="lazy"
+                          onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = '/img/logo-osky.png'; }}
+                        />
+                      </Link>
+                      <div className="osky-checkout__item-detalles">
+                        <span className="osky-checkout__categoria">{item.categoria || 'Servicio creativo'}</span>
+                        <h3><Link to={`/producto/${item.id}`}>{item.nombre}</Link></h3>
+                        <p>{dinero(precio)} por unidad</p>
+                        <button className="osky-checkout__quitar" type="button" onClick={() => removeFromCart(item.id)}>
+                          Quitar de mi selección
+                        </button>
+                      </div>
+                      <div className="osky-checkout__item-controles">
+                        <strong>{dinero(precio * cantidad)}</strong>
+                        <div className="osky-checkout__cantidad" aria-label={`Cantidad para ${item.nombre}`}>
+                          <button type="button" onClick={() => decreaseQuantity(item.id)} disabled={cantidad <= 1} aria-label={`Restar una unidad de ${item.nombre}`}>−</button>
+                          <span aria-live="polite">{cantidad}</span>
+                          <button type="button" onClick={() => increaseQuantity(item.id)} disabled={hayLimite && cantidad >= stock} aria-label={`Agregar una unidad de ${item.nombre}`}>+</button>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+              <div className="osky-checkout__nota"><span aria-hidden="true">✦</span> La disponibilidad de los servicios se confirma al coordinar el pedido.</div>
+            </div>
+
+            <aside className="osky-checkout__resumen" aria-labelledby="osky-resumen-title">
+              <span className="osky-checkout__eyebrow">RESUMEN DE TU PROYECTO</span>
+              <h2 id="osky-resumen-title">Tu presupuesto</h2>
+              <div className="osky-checkout__precio-renglon"><span>Subtotal</span><strong>{dinero(totalPrice)}</strong></div>
+              {cuponAplicado && (
+                <div className="osky-checkout__precio-renglon osky-checkout__descuento">
+                  <span>Descuento ({descuentoPorcentaje}%)</span><strong>−{dinero(descuento)}</strong>
+                </div>
+              )}
+
+              <form className="osky-checkout__cupon" onSubmit={aplicarCupon}>
+                <label htmlFor="osky-cupon">¿Tenés un cupón de descuento?</label>
+                <div className="osky-checkout__cupon-fila">
+                  <input id="osky-cupon" value={codigoCupon} onChange={(e) => { setCodigoCupon(e.target.value); setErrorCupon(''); }} placeholder="Ej.: OSKY15" disabled={Boolean(cuponAplicado) || validandoCupon} autoComplete="off" />
+                  {cuponAplicado ? (
+                    <button type="button" onClick={quitarCupon}>Quitar</button>
+                  ) : (
+                    <button type="submit" disabled={validandoCupon}>{validandoCupon ? '...' : 'Aplicar'}</button>
+                  )}
+                </div>
+                {errorCupon && <p className="osky-checkout__error" role="alert">{errorCupon}</p>}
+                {cuponAplicado && <p className="osky-checkout__cupon-ok" role="status">✓ Cupón {cuponAplicado.codigo} aplicado</p>}
+              </form>
+
+              <div className="osky-checkout__total">
+                <span>Total estimado</span>
+                <strong>{dinero(total)}</strong>
+              </div>
+              <p className="osky-checkout__aclaracion">El importe y el descuento quedan sujetos a la confirmación final del negocio.</p>
+              <a
+                className="osky-checkout__boton osky-checkout__boton--primario osky-checkout__whatsapp"
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Enviar consulta por WhatsApp <span aria-hidden="true">↗</span>
+              </a>
+              <p className="osky-checkout__privacidad">El carrito se conserva al abrir WhatsApp. Podés volver sin perder tu selección.</p>
+            </aside>
           </div>
         )}
-
-        <div className="cart-total-row">
-          <span>Total a Pagar:</span>
-          <span className="cart-total-amount">${totalConDescuento.toLocaleString('es-AR')} ARS</span>
-        </div>
-
-        <div className="cart-actions">
-          <button
-            onClick={handleFinalizarCompra}
-            className="cta-button main-cta"
-            style={{ background: '#25D366', borderColor: '#25D366', display: 'flex', alignItems: 'center', gap: '10px' }}
-          >
-            <i className="fab fa-whatsapp" style={{ fontSize: '1.4rem' }}></i>
-            Finalizar Compra
-          </button>
-
-          <button onClick={handleVaciarCarrito} className="clear-cart-btn-secondary">
-            Vaciar todo el carrito
-          </button>
-        </div>
       </div>
+
+      {confirmarVaciar && (
+        <div className="osky-checkout__modal-fondo" onMouseDown={(e) => { if (e.target === e.currentTarget) setConfirmarVaciar(false); }}>
+          <div className="osky-checkout__modal" role="dialog" aria-modal="true" aria-labelledby="osky-confirmar-titulo">
+            <span className="osky-checkout__vacio-icono" aria-hidden="true">!</span>
+            <h2 id="osky-confirmar-titulo">¿Vaciar tu carrito?</h2>
+            <p>Se quitarán todos los servicios seleccionados. Esta acción no se puede deshacer.</p>
+            <div className="osky-checkout__modal-botones">
+              <button type="button" onClick={() => setConfirmarVaciar(false)} autoFocus>Cancelar</button>
+              <button type="button" className="osky-checkout__boton-peligro" onClick={vaciar}>Sí, vaciar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
