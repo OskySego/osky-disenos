@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthProvider';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import './css/styles.css';
+import './css/sistema-visual-osky.css';
 
 // Carga cada página cuando el visitante accede a su ruta.
 // Las páginas existentes utilizan exportaciones con nombre.

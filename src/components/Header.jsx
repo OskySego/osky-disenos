@@ -28,16 +28,46 @@ export const Header = () => {
     const primerEnlace = document.querySelector('#osky-menu-principal a');
     primerEnlace?.focus();
 
-    const cerrarConEscape = (evento) => {
+    const manejarTeclado = (evento) => {
       if (evento.key === 'Escape') {
+        evento.preventDefault();
         setMenuOpen(false);
         botonMenuRef.current?.focus();
+        return;
+      }
+
+      if (evento.key !== 'Tab') return;
+
+      const menu = document.getElementById('osky-menu-principal');
+      const enlaces = Array.from(menu?.querySelectorAll('a[href]') ?? []);
+      const primero = enlaces[0];
+      const ultimo = enlaces[enlaces.length - 1];
+      const boton = botonMenuRef.current;
+      if (!primero || !ultimo || !boton) return;
+
+      const activo = document.activeElement;
+      // El menú funciona como panel modal: solo los enlaces y el botón de cierre
+      // participan del recorrido con Tab, evitando ir al contenido de fondo.
+      if (evento.shiftKey) {
+        if (activo === primero) {
+          evento.preventDefault();
+          boton.focus();
+        } else if (activo === boton || !menu.contains(activo)) {
+          evento.preventDefault();
+          ultimo.focus();
+        }
+      } else if (activo === ultimo) {
+        evento.preventDefault();
+        boton.focus();
+      } else if (activo === boton || !menu.contains(activo)) {
+        evento.preventDefault();
+        primero.focus();
       }
     };
 
-    document.addEventListener('keydown', cerrarConEscape);
+    document.addEventListener('keydown', manejarTeclado);
     return () => {
-      document.removeEventListener('keydown', cerrarConEscape);
+      document.removeEventListener('keydown', manejarTeclado);
       document.body.style.overflow = overflowAnterior;
     };
   }, [menuOpen]);
@@ -66,6 +96,9 @@ export const Header = () => {
 
   return (
     <header className="main-header osky-premium-header">
+      <a className="osky-skip-link" href="#contenido-principal">
+        Saltar al contenido principal
+      </a>
       <div className="osky-header-inner">
         <Link
           to="/"
@@ -90,7 +123,10 @@ export const Header = () => {
             className="osky-menu-backdrop"
             type="button"
             aria-label="Cerrar menú de navegación"
-            onClick={cerrarMenu}
+            onClick={() => {
+              cerrarMenu();
+              botonMenuRef.current?.focus();
+            }}
             tabIndex={-1}
           />
         )}

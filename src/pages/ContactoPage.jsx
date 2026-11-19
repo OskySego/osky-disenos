@@ -52,7 +52,7 @@ export const ContactoPage = () => {
         <div className="hero-content">
           <div className="hero-image-container">
             <img
-              src="/img/Logo_for_Osky_Diseños.svg"
+              src="public\img\osky\fenix-osky.webp"
               alt="Logo de Osky Diseños"
               className="hero-main-image"
             />

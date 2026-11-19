@@ -124,7 +124,16 @@ export const ResenasPage = () => {
       padding: 'clamp(48px, 7vw, 92px) 20px 88px',
     }}>
       <div style={{ maxWidth: 1160, margin: '0 auto' }}>
-        <header style={{ maxWidth: 820, marginBottom: 42 }}>
+        {/* Misma composición de marca que Contacto: texto y fénix. */}
+        <div style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 'clamp(28px, 5vw, 68px)',
+          marginBottom: 48,
+        }}>
+          <header style={{ flex: '1 1 500px', minWidth: 'min(100%, 300px)', maxWidth: 820 }}>
           <p style={{ color: COLOR.lima, fontWeight: 800, letterSpacing: '0.18em', fontSize: 12, marginBottom: 16 }}>
             CONFIANZA QUE SE CONSTRUYE
           </p>
@@ -150,7 +159,33 @@ export const ResenasPage = () => {
               Explorar servicios
             </Link>
           </div>
-        </header>
+          </header>
+
+          <div style={{
+            flex: '0 1 318px',
+            width: 'min(100%, 318px)',
+            maxWidth: 318,
+            marginInline: 'auto',
+            display: 'grid',
+            placeItems: 'center',
+            position: 'relative',
+          }}>
+            <img
+              src="/img/osky/fenix-osky.webp"
+              alt="Logo de Osky Diseños con el ave fénix"
+              width="318"
+              height="318"
+              decoding="async"
+              style={{
+                display: 'block',
+                width: '100%',
+                height: 'auto',
+                borderRadius: '50%',
+                filter: 'drop-shadow(0 0 32px rgba(138, 43, 226, 0.42))',
+              }}
+            />
+          </div>
+        </div>
 
         <div style={{
           display: 'grid',

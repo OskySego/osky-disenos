@@ -1,10 +1,40 @@
-/* OSKY DISEÑOS · Único punto de entrada del diseño (App.jsx)
-   Mantener este orden: el diseño premium prevalece sobre el CSS heredado.
-   Para editar una sección, modificar su archivo; no sumar otro CSS por versión.
-*/
+/* ===============================================================
+   OSKY DISEÑOS — PUNTO ÚNICO DE ENTRADA DEL CSS GENERAL
+   Orden: variables -> base heredada -> componentes Premium ->
+          páginas Premium -> sistema visual compartido.
+
+   Importar este archivo UNA sola vez desde src/App.jsx.
+   GestionPage.css y HeaderPremium.css pueden estar importados
+   desde JSX: no eliminarlos hasta confirmar esas importaciones.
+   =============================================================== */
+
+
 @import "./variables.css";
 @import "./global.css";
 @import "./componentes.css";
 @import "./portada.css";
 @import "./catalogo.css";
-@import "./carrito.css";
+@import "./sistema-visual-osky.css";
+
+/* Accesibilidad: enlace para saltar directamente al contenido.
+   Se oculta visualmente y se muestra con el teclado. */
+.osky-premium-header .osky-skip-link {
+  position: fixed;
+  top: 0;
+  left: 12px;
+  z-index: 9999;
+  padding: 10px 16px;
+  border-radius: 0 0 12px 12px;
+  background: var(--cyber-lima, #ccff00);
+  color: var(--cyber-abisal, #1e0b36);
+  font-weight: 800;
+  text-decoration: none;
+  transform: translateY(-180%);
+}
+
+.osky-premium-header .osky-skip-link:focus,
+.osky-premium-header .osky-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--cyber-amatista, #8a2be2);
+  outline-offset: 3px;
+}
