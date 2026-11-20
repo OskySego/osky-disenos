@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FiLoader } from 'react-icons/fi';
 import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { FormularioProducto } from '../components/FormularioProducto';
@@ -220,7 +221,8 @@ export const GestionPage = () => {
               <h2 id="gestion-titulo-catalogo">Catálogo actual <span>({productos.length})</span></h2>
             </div>
             <button type="button" className="gestion-btn-actualizar" onClick={cargarProductos} disabled={loading}>
-              ↻ Actualizar
+              {loading ? <FiLoader className="gestion-spinner" aria-hidden="true" /> : <span aria-hidden="true">↻</span>}
+              {loading ? 'Actualizando...' : 'Actualizar'}
             </button>
           </div>
 
@@ -251,7 +253,12 @@ export const GestionPage = () => {
             </div>
           )}
 
-          {!errorCarga && loading && <div className="gestion-estado" role="status">Cargando publicaciones...</div>}
+          {!errorCarga && loading && (
+            <div className="gestion-estado" role="status" aria-live="polite" aria-busy="true">
+              <FiLoader className="gestion-spinner" aria-hidden="true" />
+              <span>Cargando publicaciones...</span>
+            </div>
+          )}
 
           {!errorCarga && !loading && productosFiltrados.length === 0 && (
             <div className="gestion-estado">
@@ -318,6 +325,7 @@ export const GestionPage = () => {
             <div className="gestion-modal-acciones">
               <button type="button" className="gestion-btn-editar" onClick={() => setConfirmarEliminar(null)} disabled={eliminando} autoFocus>Cancelar</button>
               <button type="button" className="gestion-btn-eliminar gestion-btn-confirmar" onClick={eliminarProducto} disabled={eliminando}>
+                {eliminando && <FiLoader className="gestion-spinner" aria-hidden="true" />}
                 {eliminando ? 'Eliminando...' : 'Sí, eliminar'}
               </button>
             </div>

@@ -243,3 +243,30 @@
   border: 1px solid rgba(235, 176, 69, 0.35);
   color: #E6E6FA;
 }
+/* OSKY DISEÑOS | Indicador de carga del administrador */
+.gestion-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  vertical-align: middle;
+  animation: gestion-spinner-rotacion 950ms linear infinite;
+}
+
+.gestion-estado .gestion-spinner {
+  margin-right: .6rem;
+}
+
+.gestion-btn-confirmar .gestion-spinner,
+.gestion-btn-actualizar .gestion-spinner,
+.gestion-form-panel .gestion-spinner {
+  margin-right: .35rem;
+}
+
+@keyframes gestion-spinner-rotacion {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gestion-spinner { animation: none; }
+}

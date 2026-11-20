@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { FiSend } from 'react-icons/fi';
+
 
 // Se conserva el endpoint existente del proyecto.
 // Confirmá en Formspree que pertenece a tu cuenta y recibe consultas.
@@ -8,43 +10,74 @@ export const ContactoPage = () => {
   const [enviando, setEnviando] = useState(false);
   const [estado, setEstado] = useState(null);
 
+  
   const enviarConsulta = async (evento) => {
     evento.preventDefault();
+
     if (enviando) return;
 
     const formulario = evento.currentTarget;
+
+    // Capturamos los datos antes de deshabilitar los campos.
+    const datosFormulario = new FormData(formulario);
+
     setEnviando(true);
     setEstado(null);
 
     try {
       const respuesta = await fetch(FORM_ENDPOINT, {
         method: 'POST',
-        body: new FormData(formulario),
+        body: datosFormulario,
         headers: {
           Accept: 'application/json',
         },
       });
 
-      if (!respuesta.ok) {
-        throw new Error(`No se pudo enviar la consulta (${respuesta.status}).`);
+      // Leemos el mensaje que devuelve Formspree.
+      let resultado = null;
+
+      try {
+        resultado = await respuesta.json();
+      } catch {
+        // Algunas respuestas pueden no incluir JSON.
       }
 
-      // Limpiar el formulario solo después de una respuesta exitosa.
+      if (!respuesta.ok) {
+        const detalles = Array.isArray(resultado?.errors)
+          ? resultado.errors
+              .map((error) => error.message)
+              .filter(Boolean)
+              .join('. ')
+          : resultado?.error || resultado?.message || '';
+
+        throw new Error(
+          `Formspree respondió HTTP ${respuesta.status}` +
+          (detalles ? `: ${detalles}` : '')
+        );
+      }
+
       formulario.reset();
+
       setEstado({
         tipo: 'exito',
-        mensaje: '¡Consulta enviada! Gracias por escribirnos. Te responderemos por el medio que nos indicaste.',
+        mensaje:
+          '¡Consulta enviada correctamente! Gracias por comunicarte con Osky Diseños.',
       });
     } catch (error) {
-      console.error('Error al enviar el formulario de contacto:', error);
+      console.error('Error de contacto:', error);
+
       setEstado({
         tipo: 'error',
-        mensaje: 'No se pudo enviar la consulta. Revisá tu conexión e intentá nuevamente. Tus datos siguen en el formulario.',
+        mensaje:
+          error instanceof TypeError
+            ? 'No se pudo establecer conexión con Formspree. Revisá la conexión o los bloqueos del navegador.'
+            : `No se pudo enviar la consulta. ${error.message}`,
       });
     } finally {
       setEnviando(false);
     }
   };
+
 
   return (
     <>
@@ -52,7 +85,7 @@ export const ContactoPage = () => {
         <div className="hero-content">
           <div className="hero-image-container">
             <img
-              src="public\img\osky\fenix-osky.webp"
+              src="img/osky/fenix-osky.webp"
               alt="Logo de Osky Diseños"
               className="hero-main-image"
             />
@@ -123,7 +156,7 @@ export const ContactoPage = () => {
               <label htmlFor="mensaje">¿En qué puedo ayudarte?</label>
               <textarea
                 id="mensaje"
-                name="mensaje"
+                name="message"
                 rows={6}
                 required
                 minLength={10}
@@ -153,7 +186,7 @@ export const ContactoPage = () => {
               disabled={enviando}
               aria-disabled={enviando}
             >
-              <i className="fas fa-paper-plane" aria-hidden="true" />
+              <FiSend size={18} aria-hidden="true" />
               {' '}{enviando ? 'Enviando consulta...' : 'Enviar consulta'}
             </button>
           </form>

@@ -1,4 +1,6 @@
+// src/components/FormularioProducto.jsx
 import { useState } from 'react';
+import { FiLoader } from 'react-icons/fi';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -78,7 +80,7 @@ export const FormularioProducto = ({
 
     const nombreLimpio = form.nombre.trim();
     const categoriaLimpia = form.categoria.trim();
-    const precioNumero = Number(String(form.precio).replace(/\./g, '').trim());
+    const precioNumero = Number(String(form.precio).trim());
     const stockNumero = form.stock === '' ? 50 : Number(form.stock);
 
     if (!nombreLimpio || !categoriaLimpia) {
@@ -86,13 +88,13 @@ export const FormularioProducto = ({
       return;
     }
 
-    if (!Number.isFinite(precioNumero) || precioNumero < 0) {
-      setErrorForm('Ingresá un precio válido en números enteros (ej: 135000).');
+    if (!Number.isSafeInteger(precioNumero) || precioNumero <= 0) {
+      setErrorForm('El precio debe ser un número entero mayor que cero (ej: 135000).');
       return;
     }
 
-    if (!Number.isFinite(stockNumero) || stockNumero < 0) {
-      setErrorForm('Ingresá una cantidad de cupos/stock válida.');
+    if (!Number.isSafeInteger(stockNumero) || stockNumero < 0) {
+      setErrorForm('El stock debe ser un número entero igual o mayor que cero.');
       return;
     }
 
@@ -132,7 +134,7 @@ export const FormularioProducto = ({
   return (
     <form onSubmit={handleSubmit} className="contact-form" noValidate>
       {errorForm && (
-        <p style={{ color: '#ff6b6b', fontWeight: '600', textAlign: 'left' }}>
+        <p role="alert" style={{ color: '#ff6b6b', fontWeight: '600', textAlign: 'left' }}>
           ⚠️ {errorForm}
         </p>
       )}
@@ -176,7 +178,7 @@ export const FormularioProducto = ({
             id="prod-precio"
             name="precio"
             type="number"
-            min="0"
+            min="1"
             step="1"
             value={form.precio}
             onChange={handleChange}
@@ -256,6 +258,7 @@ export const FormularioProducto = ({
 
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px' }}>
         <button type="submit" className="cta-button main-cta" disabled={guardando}>
+          {guardando && <FiLoader className="gestion-spinner" aria-hidden="true" />}
           {guardando
             ? 'Guardando...'
             : modoEdicion
