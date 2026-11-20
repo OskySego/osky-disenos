@@ -12,6 +12,7 @@ import {
 import { auth, db } from '../firebase/config';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { ResumenAdmin } from '../components/ResumenAdmin';
 
 // Estilos aislados: no se modifica ninguna hoja CSS global.
 const Perfil = styled.section`
@@ -304,6 +305,8 @@ export const PerfilPage = () => {
             </div>
           </section>
         </div>
+
+        {rol === 'admin' && <ResumenAdmin />}
 
         {rol === 'admin' && (
           <section className="op-tarjeta op-extra" aria-labelledby="op-admin-titulo">
