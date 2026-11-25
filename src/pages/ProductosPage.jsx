@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { ItemListContainer } from '../components/ItemListContainer';
 // Este componente usa las rutas reales de App.jsx: /productos y /contacto.

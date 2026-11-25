@@ -1,10 +1,10 @@
-import React from 'react';
 import PortadaOsky from '../components/PortadaOsky';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap-grid.min.css';
 import { TarjetaBeneficio } from '../components/TarjetaBeneficio';
+import { OfertasDestacadas } from '../components/OfertasDestacadas';
 
 /**
  * Página principal de la ruta `/`. La cabecera y el pie de página
@@ -13,6 +13,7 @@ import { TarjetaBeneficio } from '../components/TarjetaBeneficio';
 export const Home = () => (
   <>
     <PortadaOsky />
+    <OfertasDestacadas />
 
     <section className="why-us-section" aria-labelledby="por-que-osky">
       <h2 className="why-us-title" id="por-que-osky">

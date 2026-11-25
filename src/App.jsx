@@ -24,6 +24,18 @@ const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default:
 const RegistroPage = lazy(() => import('./pages/RegistroPage').then((m) => ({ default: m.RegistroPage })));
 const PerfilPage = lazy(() => import('./pages/PerfilPage').then((m) => ({ default: m.PerfilPage })));
 
+const SolicitudesPage = lazy(() =>
+  import('./pages/SolicitudesPage').then((m) => ({
+    default: m.SolicitudesPage
+  }))
+);
+
+const OfertasAdminPage = lazy(() =>
+  import('./pages/OfertasAdminPage').then((m) => ({
+    default: m.OfertasAdminPage
+  }))
+);
+
 const PantallaCargando = () => (
   <div
     role="status"
@@ -82,6 +94,26 @@ function App() {
                   element={
                     <ProtectedRoute rolesPermitidos={['admin']}>
                       <GestionCuponesPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* HISTORIAL DE SOLICITUDES */}
+                <Route
+                  path="solicitudes"
+                  element={
+                    <ProtectedRoute>
+                      <SolicitudesPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* ADMINISTRACIÓN DE OFERTAS */}
+                <Route
+                  path="admin/ofertas"
+                  element={
+                    <ProtectedRoute rolesPermitidos={['admin']}>
+                      <OfertasAdminPage />
                     </ProtectedRoute>
                   }
                 />

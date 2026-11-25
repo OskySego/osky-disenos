@@ -1,9 +1,11 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { CartContext } from '../context/CartContext';
 import '../css/CarritoPremium.css';
+import { CheckoutFinal } from '../components/CheckoutFinal';
+
 
 const moneda = new Intl.NumberFormat('es-AR', {
   style: 'currency',
@@ -209,14 +211,12 @@ export const CarritoPage = () => {
                 <strong>{dinero(total)}</strong>
               </div>
               <p className="osky-checkout__aclaracion">El importe y el descuento quedan sujetos a la confirmación final del negocio.</p>
-              <a
-                className="osky-checkout__boton osky-checkout__boton--primario osky-checkout__whatsapp"
-                href={whatsappHref}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Enviar consulta por WhatsApp <span aria-hidden="true">↗</span>
-              </a>
+              <CheckoutFinal
+                cart={cart}
+                totalEstimado={total}
+                codigoCupon={cuponAplicado?.codigo || ''}
+                whatsappHref={whatsappHref}
+              />
               <p className="osky-checkout__privacidad">El carrito se conserva al abrir WhatsApp. Podés volver sin perder tu selección.</p>
             </aside>
           </div>

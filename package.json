@@ -13,6 +13,8 @@
     "bootstrap": "^5.3.9",
     "dotenv": "^18.0.4",
     "firebase": "^13.4.0",
+    "firebase-admin": "^14.5.1",
+    "mercadopago": "^3.6.2",
     "mongoose": "^9.10.2",
     "react": "^19.2.8",
     "react-bootstrap": "^2.10.10",

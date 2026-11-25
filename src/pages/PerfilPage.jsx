@@ -302,6 +302,11 @@ export const PerfilPage = () => {
                 <span><strong>Contactar al estudio</strong><small>Contanos tu próximo proyecto</small></span>
                 <FiArrowUpRight aria-hidden="true" />
               </Link>
+              <Link className="op-acceso" to="/solicitudes">
+                <FiPackage aria-hidden="true" />
+                <span><strong>Mis solicitudes</strong><small>Presupuestos e historial</small></span>
+                <FiArrowUpRight aria-hidden="true" />
+              </Link>
             </div>
           </section>
         </div>
@@ -318,6 +323,12 @@ export const PerfilPage = () => {
               </Link>
               <Link className="op-acceso" to="/admin/cupones">
                 <FiTag aria-hidden="true" /><span><strong>Gestión de cupones</strong><small>Administrar descuentos</small></span><FiArrowUpRight aria-hidden="true" />
+              </Link>
+              <Link className="op-acceso" to="/admin/ofertas">
+                <FiTag aria-hidden="true" /><span><strong>Ofertas y cupos</strong><small>Descuentos y stock promocional</small></span><FiArrowUpRight aria-hidden="true" />
+              </Link>
+              <Link className="op-acceso" to="/solicitudes">
+                <FiPackage aria-hidden="true" /><span><strong>Solicitudes recibidas</strong><small>Consultar presupuestos</small></span><FiArrowUpRight aria-hidden="true" />
               </Link>
             </div>
           </section>

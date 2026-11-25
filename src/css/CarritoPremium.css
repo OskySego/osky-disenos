@@ -115,3 +115,72 @@
 @media(prefers-reduced-motion: reduce) {
   .osky-checkout *, .osky-checkout *::before, .osky-checkout *::after { transition: none!important; animation: none!important; }
 }
+
+/* OSKY DISEÑOS - ACCIONES DEL CHECKOUT */
+
+.osky-checkout__acciones {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  margin-top: 24px;
+}
+
+.osky-checkout__acciones > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.osky-checkout__whatsapp-nuevo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 16px;
+  border: 1px solid #8b5cf6;
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #f2f0f7;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.osky-checkout__whatsapp-nuevo:hover {
+  background: rgba(139, 92, 246, 0.3);
+  color: #ffffff;
+}
+
+.osky-checkout__guardar {
+  overflow: hidden;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 12px;
+  background: rgba(30, 11, 54, 0.5);
+}
+
+.osky-checkout__guardar summary {
+  padding: 16px;
+  color: #d9cdeb;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
+.osky-checkout__guardar > div {
+  margin: 0 12px 12px;
+  padding: 14px;
+}
+
+.osky-checkout__aviso-pago {
+  margin: 0;
+  color: #b9a8ce;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  text-align: center;
+}
