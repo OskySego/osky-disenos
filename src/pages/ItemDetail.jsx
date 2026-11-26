@@ -74,7 +74,7 @@ const ItemDetailContenido = ({ id }) => {
       ? rutaLimpia
       : rutaLimpia
       ? `/${rutaLimpia}`
-      : '/img/Logo_for_Osky_Diseños.svg';
+      : '/img/logo-osky.png';
 
   const caracteristicasGuardadas = Array.isArray(producto.caracteristicas)
     ? producto.caracteristicas
