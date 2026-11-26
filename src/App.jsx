@@ -18,6 +18,11 @@ const ItemDetail = lazy(() => import('./pages/ItemDetail').then((m) => ({ defaul
 const ResenasPage = lazy(() => import('./pages/ResenasPage').then((m) => ({ default: m.ResenasPage })));
 const ContactoPage = lazy(() => import('./pages/ContactoPage').then((m) => ({ default: m.ContactoPage })));
 const CarritoPage = lazy(() => import('./pages/CarritoPage').then((m) => ({ default: m.CarritoPage })));
+const ResultadoPagoPage = lazy(() =>
+  import('./pages/ResultadoPagoPage').then((m) => ({
+    default: m.ResultadoPagoPage,
+  }))
+);
 const GestionPage = lazy(() => import('./pages/GestionPage').then((m) => ({ default: m.GestionPage })));
 const GestionCuponesPage = lazy(() => import('./pages/GestionCuponesPage').then((m) => ({ default: m.GestionCuponesPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
@@ -68,6 +73,7 @@ function App() {
                 <Route path="resenas" element={<ResenasPage />} />
                 <Route path="contacto" element={<ContactoPage />} />
                 <Route path="carrito" element={<CarritoPage />} />
+                <Route path="resultado-pago" element={<ResultadoPagoPage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="registro" element={<RegistroPage />} />
 
